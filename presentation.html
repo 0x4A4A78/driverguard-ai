@@ -406,19 +406,6 @@
 
         </div>
 
-        <!-- Bottom Execution Actions -->
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 0.5rem;">
-          <div style="display: flex; align-items: center; gap: 1rem;">
-            <span class="font-mono" style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: 600;">[STATUS: READY FOR EVALUATION]</span>
-            <span style="font-size: 0.82rem; color: var(--text-muted);">โครงงานนำเสนอปลายภาควิชาปัญญาประดิษฐ์ (AI)</span>
-          </div>
-
-          <button id="start-deck-btn" class="btn-action-tech">
-            <span>เข้าสู่เนื้อหาการนำเสนอ</span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-        </div>
-
       </div>
     </section>
 
@@ -984,7 +971,6 @@
         // Prev / Next Buttons
         document.getElementById('prev-btn').addEventListener('click', () => this.goToSlide(this.currentSlide - 1));
         document.getElementById('next-btn').addEventListener('click', () => this.goToSlide(this.currentSlide + 1));
-        document.getElementById('start-deck-btn').addEventListener('click', () => this.goToSlide(2));
 
         // Step Indicators
         this.stepIndicators.forEach(step => {
