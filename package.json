@@ -22,9 +22,6 @@
   "author": "Mini-Project AI",
   "license": "MIT",
   "dependencies": {
-    "@mediapipe/camera_utils": "^0.4.1675466862",
-    "@mediapipe/drawing_utils": "^0.3.1675466124",
-    "@mediapipe/face_mesh": "^0.4.1633559619",
     "canvas-confetti": "^1.9.4",
     "lucide": "^1.16.0",
     "qrcode": "^1.5.4"
