@@ -3,17 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DriverGuard AI - Presentation Deck</title>
+  <title>DriverGuard AI — Edge Computer Vision Drowsiness Detection</title>
   
-  <!-- Thai & Modern Fonts -->
+  <!-- Thai & Monospace Engineering Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Canvas Confetti for celebration -->
+  <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
 
   <style>
+    :root {
+      --bg-dark: #07090e;
+      --bg-panel: #0d121f;
+      --bg-panel-hover: #121a2c;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(0, 229, 255, 0.4);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-cyan: #00e5ff;
+      --accent-emerald: #00e676;
+      --accent-amber: #f59e0b;
+      --accent-crimson: #ff3b5c;
+      --accent-purple: #a855f7;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -21,32 +36,35 @@
     }
 
     body {
-      font-family: 'Kanit', sans-serif;
-      background-color: #070a12;
-      color: #f1f5f9;
+      font-family: 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
       overflow: hidden;
       height: 100vh;
       width: 100vw;
       user-select: none;
+      -webkit-font-smoothing: antialiased;
     }
 
     .font-mono {
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Ambient Cockpit Background */
-    .deck-bg {
+    /* Precision Technical Grid Background */
+    .telemetry-grid {
       position: fixed;
       inset: 0;
       background-image: 
-        radial-gradient(circle at 50% 10%, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
-        radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 10% 80%, rgba(239, 68, 68, 0.05) 0%, transparent 40%);
+        radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 90% 90%, rgba(0, 230, 118, 0.04) 0%, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
       pointer-events: none;
       z-index: 0;
     }
 
-    /* Slides Container */
+    /* Slide Deck Layout */
     .slides-wrapper {
       position: relative;
       width: 100vw;
@@ -61,11 +79,11 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 2.5rem 4rem;
+      padding: 4.5rem 3.5rem 5.5rem;
       opacity: 0;
       visibility: hidden;
-      transform: scale(0.96) translateY(15px);
-      transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: scale(0.97) translateY(12px);
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s;
       pointer-events: none;
     }
 
@@ -76,386 +94,666 @@
       pointer-events: auto;
     }
 
-    /* Glass Panels */
-    .glass-card {
-      background: rgba(13, 20, 36, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 1.25rem;
+    /* Technical Card & Reticles */
+    .cad-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.5rem;
+      position: relative;
     }
 
-    .glass-card-interactive {
-      background: rgba(13, 20, 36, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 1.25rem;
-      transition: all 0.25s ease;
+    .cad-panel-interactive {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.5rem;
+      transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
     }
 
-    .glass-card-interactive:hover {
-      border-color: rgba(6, 182, 212, 0.4);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px -10px rgba(6, 182, 212, 0.2);
+    .cad-panel-interactive:hover {
+      border-color: var(--border-focus);
+      background: var(--bg-panel-hover);
     }
 
-    /* Top Progress Bar */
-    .progress-bar-container {
+    /* Precision Corner Reticles */
+    .reticle-corner {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-color: var(--accent-cyan);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .reticle-tl { top: -1px; left: -1px; border-top: 2px solid; border-left: 2px solid; }
+    .reticle-tr { top: -1px; right: -1px; border-top: 2px solid; border-right: 2px solid; }
+    .reticle-bl { bottom: -1px; left: -1px; border-bottom: 2px solid; border-left: 2px solid; }
+    .reticle-br { bottom: -1px; right: -1px; border-bottom: 2px solid; border-right: 2px solid; }
+
+    /* Top Telemetry Header */
+    .top-telemetry-bar {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.05);
+      height: 3.5rem;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(7, 9, 14, 0.85);
+      backdrop-filter: blur(12px);
       z-index: 50;
     }
 
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #06b6d4, #10b981);
+    /* Top Progress Bar */
+    .deck-progress {
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald));
       width: 16.66%;
-      transition: width 0.35s ease;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Navigation Bar */
-    .deck-nav {
+    /* Navigation Dock */
+    .deck-nav-dock {
       position: fixed;
       bottom: 1.5rem;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
       align-items: center;
-      gap: 1rem;
-      background: rgba(10, 15, 28, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 0.5rem 1.25rem;
-      border-radius: 9999px;
-      backdrop-filter: blur(12px);
+      gap: 0.75rem;
+      background: rgba(13, 18, 31, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.4rem 1rem;
+      border-radius: 0.5rem;
+      backdrop-filter: blur(16px);
       z-index: 50;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
     }
 
-    .nav-btn {
+    .nav-ctrl-btn {
       background: transparent;
-      border: none;
-      color: #94a3b8;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
       cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 0.35rem 0.6rem;
-      border-radius: 9999px;
+      gap: 0.35rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 0.35rem;
       transition: all 0.2s ease;
+      font-size: 0.8rem;
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .nav-ctrl-btn:hover {
+      color: var(--text-main);
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .slide-step-indicator {
+      width: 20px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.15);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .slide-step-indicator.active {
+      width: 32px;
+      background: var(--accent-cyan);
+    }
+
+    /* Buttons */
+    .btn-action-tech {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      color: var(--accent-cyan);
+      padding: 0.5rem 1rem;
+      border-radius: 0.35rem;
       font-size: 0.85rem;
       font-weight: 600;
-    }
-
-    .nav-btn:hover {
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .slide-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.2);
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
     }
 
-    .slide-dot.active {
-      width: 24px;
-      background: #06b6d4;
+    .btn-action-tech:hover {
+      background: rgba(0, 229, 255, 0.22);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px rgba(0, 229, 255, 0.25);
     }
 
-    /* Key Badge */
-    .key-badge {
-      display: inline-block;
-      padding: 0.15rem 0.4rem;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 0.35rem;
-      font-family: monospace;
-      font-size: 0.75rem;
-      color: #cbd5e1;
+    .btn-action-tech:active {
+      transform: scale(0.98);
     }
 
-    /* Eye Landmark Simulation SVG */
-    .eye-mesh-svg {
+    /* Modal / Drawers */
+    .deck-drawer {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .deck-drawer.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* QR Code Viewfinder Scan Line */
+    .qr-viewfinder {
+      position: relative;
+      background: #ffffff;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+
+    .qr-scan-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #00e5ff, transparent);
+      box-shadow: 0 0 8px #00e5ff;
+      animation: qrScan 2.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes qrScan {
+      0% { top: 0%; opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* Slider Range Custom Style */
+    input[type=range] {
+      -webkit-appearance: none;
       width: 100%;
-      height: 180px;
+      background: rgba(255, 255, 255, 0.1);
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
     }
 
-    /* QR Code Card Animation */
-    .qr-frame {
-      box-shadow: 0 0 50px rgba(6, 182, 212, 0.25);
-      border: 2px solid rgba(6, 182, 212, 0.5);
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+      border: 2px solid #ffffff;
+    }
+
+    /* Live Waveform Canvas */
+    #sim-oscilloscope {
+      width: 100%;
+      height: 70px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 0.35rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      display: block;
     }
   </style>
 </head>
 <body>
 
-  <!-- Ambient Glow Background -->
-  <div class="deck-bg"></div>
+  <!-- Precision Background Grid -->
+  <div class="telemetry-grid"></div>
 
-  <!-- Top Progress Bar -->
-  <div class="progress-bar-container">
-    <div id="progress-bar" class="progress-bar-fill"></div>
-  </div>
-
-  <!-- Header Info -->
-  <header style="position: fixed; top: 1.25rem; left: 2.5rem; right: 2.5rem; display: flex; justify-content: space-between; align-items: center; z-index: 40;">
-    <div style="display: flex; align-items: center; gap: 0.75rem;">
-      <div style="width: 2rem; height: 2rem; border-radius: 0.5rem; background: #06b6d4; display: flex; align-items: center; justify-content: center;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      </div>
-      <div>
-        <span style="font-weight: 700; font-size: 1rem; letter-spacing: -0.02em;">DriverGuard <span style="color: #22d3ee;">AI</span></span>
-        <span style="font-size: 0.7rem; color: #94a3b8; margin-left: 0.5rem; padding: 0.15rem 0.5rem; background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3); border-radius: 9999px;">Mini-Project Presentation</span>
-      </div>
-    </div>
+  <!-- ================= TOP TELEMETRY BAR ================= -->
+  <header class="top-telemetry-bar">
+    
+    <!-- Left: Identity -->
     <div style="display: flex; align-items: center; gap: 1rem;">
-      <span id="slide-counter" class="font-mono" style="font-size: 0.85rem; color: #94a3b8; font-weight: 700;">01 / 06</span>
-      <button id="fullscreen-btn" title="Toggle Fullscreen (F)" class="nav-btn" style="padding: 0.4rem;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-      </button>
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        <span class="font-mono" style="font-weight: 800; font-size: 0.95rem; letter-spacing: -0.01em;">
+          DRIVERGUARD <span style="color: var(--accent-cyan);">AI</span>
+        </span>
+      </div>
+      <div style="width: 1px; height: 1.25rem; background: rgba(255,255,255,0.12);"></div>
+      <span class="font-mono" style="font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase;">
+        SAU // AI-MINI-PROJECT // 2026
+      </span>
     </div>
+
+    <!-- Center: Active Slide Title -->
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <span id="header-slide-num" class="font-mono" style="font-size: 0.8rem; font-weight: 700; color: var(--accent-cyan); background: rgba(0,229,255,0.08); padding: 0.2rem 0.5rem; border-radius: 0.25rem; border: 1px solid rgba(0,229,255,0.2);">
+        SEC 01
+      </span>
+      <span id="header-slide-title" style="font-size: 0.85rem; color: var(--text-main); font-weight: 500;">
+        System Overview & Specifications
+      </span>
+    </div>
+
+    <!-- Right: Telemetry Controls & Stopwatch -->
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      
+      <!-- Speaking Stopwatch (Presentation Timer) -->
+      <div id="deck-stopwatch-box" title="Presentation Timer (Click to Start/Pause)" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.6rem; border-radius: 0.35rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); cursor: pointer;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="deck-stopwatch-display" class="font-mono" style="font-size: 0.78rem; font-weight: 700; color: var(--accent-emerald);">00:00</span>
+      </div>
+
+      <!-- Presenter Notes Toggle (N) -->
+      <button id="toggle-notes-btn" title="Presenter Notes (N)" class="nav-ctrl-btn" style="padding: 0.25rem 0.5rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>NOTES</span>
+      </button>
+
+      <!-- Keymap Guide Modal Toggle (?) -->
+      <button id="toggle-keymap-btn" title="Keyboard Shortcuts (?)" class="nav-ctrl-btn" style="padding: 0.25rem 0.5rem;">
+        <span class="font-mono">?</span>
+      </button>
+
+      <!-- Fullscreen Toggle (F) -->
+      <button id="fullscreen-btn" title="Toggle Fullscreen (F)" class="nav-ctrl-btn" style="padding: 0.25rem 0.5rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+
+    </div>
+
+    <!-- Active Deck Progress Track -->
+    <div id="deck-progress-bar" class="deck-progress"></div>
   </header>
 
   <!-- ================= SLIDES WRAPPER ================= -->
-  <div class="slides-wrapper">
+  <main class="slides-wrapper">
 
-    <!-- ---------------- SLIDE 1: HERO & TITLE ---------------- -->
-    <section class="slide active" data-slide="1">
-      <div style="max-w: 900px; text-align: center; display: flex; flex-direction: column; align-items: center;">
+    <!-- ---------------- SLIDE 1: SYSTEM OVERVIEW & ARCHITECTURE ---------------- -->
+    <section class="slide active" data-slide="1" data-title="System Overview & Specifications">
+      <div style="width: 100%; max-width: 1080px;">
         
-        <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; border-radius: 9999px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); margin-bottom: 1.5rem;">
-          <span style="width: 8px; height: 8px; border-radius: 9999px; background: #10b981;"></span>
-          <span style="font-size: 0.85rem; color: #67e8f9; font-weight: 500;">Edge Computer Vision • 100% Client-Side</span>
-        </div>
-
-        <h1 style="font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.25rem; letter-spacing: -0.03em;">
-          DriverGuard <span style="color: #22d3ee;">AI</span>
-        </h1>
-
-        <p style="font-size: 1.5rem; color: #cbd5e1; max-width: 720px; line-height: 1.5; margin-bottom: 2.5rem; font-weight: 400;">
-          ระบบตรวจจับและแจ้งเตือนอาการหลับในของผู้ขับขี่แบบเรียลไทม์<br>
-          <span style="font-size: 1.15rem; color: #94a3b8;">ด้วยแนวคิด Computer Vision โดยไม่ต้องพึ่งพาเซนเซอร์ฮาร์ดแวร์</span>
-        </p>
-
-        <!-- Meta Details Card -->
-        <div class="glass-card" style="display: flex; gap: 2.5rem; padding: 1.25rem 2.5rem; text-align: left;">
+        <!-- Architectural Spec Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1.5rem;">
           <div>
-            <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.2rem;">วิชาที่นำเสนอ</span>
-            <strong style="color: #f1f5f9; font-size: 0.95rem;">Artificial Intelligence (Mini-Project)</strong>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <span style="display: inline-block; width: 6px; height: 6px; background: var(--accent-emerald); border-radius: 50%;"></span>
+              <span class="font-mono" style="font-size: 0.75rem; letter-spacing: 0.08em; color: var(--accent-cyan); text-transform: uppercase;">
+                COMPUTER VISION APPLIED RESEARCH // INDIVIDUAL MINI-PROJECT
+              </span>
+            </div>
+            <h1 style="font-size: 3.5rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; color: #ffffff;">
+              DRIVERGUARD <span style="color: var(--accent-cyan);">AI</span>
+            </h1>
+            <p style="font-size: 1.25rem; color: var(--text-muted); margin-top: 0.5rem; max-width: 700px; font-weight: 400; line-height: 1.5;">
+              ระบบตรวจจับและแจ้งเตือนอาการหลับในของผู้ขับขี่แบบ Edge Computing Real-time บนเว็บเบราว์เซอร์ 100%
+            </p>
           </div>
-          <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
-          <div>
-            <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.2rem;">โมเดล AI หลัก</span>
-            <strong style="color: #22d3ee; font-size: 0.95rem;">MediaPipe 468 Face Mesh (EAR / MAR)</strong>
-          </div>
-          <div style="width: 1px; background: rgba(255,255,255,0.1);"></div>
-          <div>
-            <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 0.2rem;">แพลตฟอร์ม</span>
-            <strong style="color: #34d399; font-size: 0.95rem;">Web & Mobile (Responsive)</strong>
+
+          <div style="text-align: right;">
+            <div class="font-mono" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.35rem;">BUILD TARGET</div>
+            <div class="font-mono" style="font-size: 0.95rem; font-weight: 700; color: var(--accent-emerald);">CLIENT-SIDE WASM</div>
+            <div class="font-mono" style="font-size: 0.72rem; color: #64748b; margin-top: 0.25rem;">ZERO-SERVER STREAMING</div>
           </div>
         </div>
 
-        <p style="margin-top: 2rem; font-size: 0.85rem; color: #64748b;">
-          กดปุ่ม <span class="key-badge">→</span> หรือ <span class="key-badge">Spacebar</span> เพื่อเลื่อนสไลด์ถัดไป
-        </p>
-
-      </div>
-    </section>
-
-    <!-- ---------------- SLIDE 2: THE PROBLEM ---------------- -->
-    <section class="slide" data-slide="2">
-      <div style="width: 100%; max-width: 1050px;">
-        
-        <div style="margin-bottom: 2rem;">
-          <span style="color: #f43f5e; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Problem Statement</span>
-          <h2 style="font-size: 2.75rem; font-weight: 700; margin-top: 0.25rem;">ความเสี่ยงระดับวินาที: มัจจุราชจากการ "หลับใน"</h2>
-        </div>
-
-        <div style="display: grid; grid-cols: 1; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+        <!-- Telemetry Matrix Grid -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
           
-          <!-- Card 1 -->
-          <div class="glass-card" style="padding: 2rem; border-top: 3px solid #f43f5e;">
-            <div style="font-size: 3rem; font-weight: 800; color: #f43f5e; line-height: 1;" class="font-mono">55.5 ม.</div>
-            <h3 style="font-size: 1.25rem; font-weight: 600; margin: 1rem 0 0.5rem; color: #ffffff;">ระยะทางไร้การควบคุม</h3>
-            <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">
-              หากขับรถที่ความเร็ว 100 กม./ชม. การหลับใน (Microsleep) เพียง <strong>2 วินาที</strong> รถจะพุ่งไปข้างหน้าโดยไม่มีผู้ควบคุมเป็นระยะทางไกลกว่าครึ่งสนามฟุตบอล
-            </p>
+          <div class="cad-panel" style="padding: 1.25rem;">
+            <div class="reticle-corner reticle-tl"></div>
+            <span class="font-mono" style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">01 // AI Vision Model</span>
+            <div style="font-size: 1.15rem; font-weight: 700; margin: 0.4rem 0 0.2rem; color: var(--accent-cyan);">MediaPipe 478 Mesh</div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">พิกัด 3 มิติบนโครงหน้าแบบไร้สัมผัส (Markerless)</p>
           </div>
 
-          <!-- Card 2 -->
-          <div class="glass-card" style="padding: 2rem; border-top: 3px solid #f59e0b;">
-            <div style="font-size: 3rem; font-weight: 800; color: #f59e0b; line-height: 1;" class="font-mono">1 ใน 3</div>
-            <h3 style="font-size: 1.25rem; font-weight: 600; margin: 1rem 0 0.5rem; color: #ffffff;">สาเหตุอุบัติเหตุรุนแรง</h3>
-            <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">
-              สถิติชี้ว่าอุบัติเหตุบนทางหลวงเกิดจากอาการเหนื่อยล้าและหลับในบ่อยครั้งที่สุด และมักมีความรุนแรงสูงเนื่องจากไม่มีการแตะเบรกชะลอความเร็วก่อนชน
-            </p>
+          <div class="cad-panel" style="padding: 1.25rem;">
+            <div class="reticle-corner reticle-tl"></div>
+            <span class="font-mono" style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">02 // Biometric Metric</span>
+            <div style="font-size: 1.15rem; font-weight: 700; margin: 0.4rem 0 0.2rem; color: var(--accent-emerald);">EAR & MAR Ratios</div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">คำนวณสัดส่วนเปลือกตาและปากด้วยเวกเตอร์ยูคลิด</p>
           </div>
 
-          <!-- Card 3 -->
-          <div class="glass-card" style="padding: 2rem; border-top: 3px solid #10b981;">
-            <div style="font-size: 3rem; font-weight: 800; color: #10b981; line-height: 1;" class="font-mono">0 บาท</div>
-            <h3 style="font-size: 1.25rem; font-weight: 600; margin: 1rem 0 0.5rem; color: #ffffff;">เป้าหมายโครงงาน</h3>
-            <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">
-              ก้าวข้ามข้อจำกัดของระบบเดิมที่ต้องซื้อฮาร์ดแวร์แพงๆ เปลี่ยนมาใช้ <strong>"ซอฟต์แวร์ AI บนเว็บ 100%"</strong> ที่ใครก็เข้าถึงได้ผ่านสมาร์ตโฟนที่มีอยู่แล้ว
-            </p>
+          <div class="cad-panel" style="padding: 1.25rem;">
+            <div class="reticle-corner reticle-tl"></div>
+            <span class="font-mono" style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">03 // Execution Target</span>
+            <div style="font-size: 1.15rem; font-weight: 700; margin: 0.4rem 0 0.2rem; color: var(--accent-amber);">Mobile & Desktop</div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">สแกนผ่านเบราว์เซอร์สมาร์ตโฟนได้ทันที 0 บาท</p>
+          </div>
+
+          <div class="cad-panel" style="padding: 1.25rem;">
+            <div class="reticle-corner reticle-tl"></div>
+            <span class="font-mono" style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">04 // Audio Synthesizer</span>
+            <div style="font-size: 1.15rem; font-weight: 700; margin: 0.4rem 0 0.2rem; color: var(--accent-crimson);">Web Audio API</div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.4;">กำเนิดความถี่ไซเรน 880/1320Hz สดในฮาร์ดแวร์</p>
           </div>
 
         </div>
 
-        <div class="glass-card" style="margin-top: 1.75rem; padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.6);">
+        <!-- Bottom Execution Actions -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border-subtle); border-radius: 0.5rem;">
           <div style="display: flex; align-items: center; gap: 1rem;">
-            <span style="font-size: 1.5rem;">💡</span>
-            <span style="color: #cbd5e1; font-size: 1rem;"><strong>สมมติฐานโครงงาน:</strong> สามารถใช้ Computer Vision ตรวจจับชีวมิติพฤติกรรม (การปิดเปลือกตาและการหาว) ได้แม่นยำแบบเรียลไทม์บนเบราว์เซอร์</span>
+            <span class="font-mono" style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: 600;">[STATUS: READY FOR EVALUATION]</span>
+            <span style="font-size: 0.82rem; color: var(--text-muted);">โครงงานนำเสนอปลายภาควิชาปัญญาประดิษฐ์ (AI)</span>
           </div>
+
+          <button id="start-deck-btn" class="btn-action-tech">
+            <span>เข้าสู่เนื้อหาการนำเสนอ</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
         </div>
 
       </div>
     </section>
 
-    <!-- ---------------- SLIDE 3: SYSTEM ARCHITECTURE ---------------- -->
-    <section class="slide" data-slide="3">
-      <div style="width: 100%; max-width: 1050px;">
+    <!-- ---------------- SLIDE 2: THE PROBLEM & PHYSICAL KINEMATICS ---------------- -->
+    <section class="slide" data-slide="2" data-title="Problem Physics & Kinematics">
+      <div style="width: 100%; max-width: 1080px;">
         
-        <div style="margin-bottom: 2rem;">
-          <span style="color: #06b6d4; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">System Pipeline</span>
-          <h2 style="font-size: 2.75rem; font-weight: 700; margin-top: 0.25rem;">สถาปัตยกรรมการทำงานของระบบ (Pipeline)</h2>
-        </div>
-
-        <!-- Flow Steps -->
-        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2rem;">
-          
-          <div class="glass-card-interactive" style="padding: 1.5rem; text-align: center;">
-            <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: rgba(6,182,212,0.15); color: #22d3ee; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-weight: 800;">1</div>
-            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #fff;">Camera Stream</h4>
-            <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.4;">รับสัญญาณภาพสด 30 FPS ผ่านเว็บแคมหรือกล้องมือถือ</p>
-          </div>
-
-          <div class="glass-card-interactive" style="padding: 1.5rem; text-align: center;">
-            <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: rgba(59,130,246,0.15); color: #60a5fa; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-weight: 800;">2</div>
-            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #fff;">FaceMesh AI</h4>
-            <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.4;">สแกนและระบุพิกัดใบหน้า 468 จุดแบบ 3 มิติ (WebGL)</p>
-          </div>
-
-          <div class="glass-card-interactive" style="padding: 1.5rem; text-align: center;">
-            <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: rgba(168,85,247,0.15); color: #c084fc; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-weight: 800;">3</div>
-            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #fff;">Feature Extraction</h4>
-            <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.4;">ดึงเฉพาะพิกัด 6 จุดรอบดวงตา และ 4 จุดรอบริมฝีปาก</p>
-          </div>
-
-          <div class="glass-card-interactive" style="padding: 1.5rem; text-align: center;">
-            <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: rgba(245,158,11,0.15); color: #fbbf24; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-weight: 800;">4</div>
-            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #fff;">EAR & MAR</h4>
-            <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.4;">คำนวณสัดส่วนเรขาคณิตวัดการปิดตาและการอ้าปาก</p>
-          </div>
-
-          <div class="glass-card-interactive" style="padding: 1.5rem; text-align: center;">
-            <div style="width: 2.5rem; height: 2.5rem; border-radius: 0.75rem; background: rgba(239,68,68,0.15); color: #f87171; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-weight: 800;">5</div>
-            <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #fff;">State & Alarm</h4>
-            <p style="font-size: 0.8rem; color: #94a3b8; line-height: 1.4;">ประเมินเวลาสะสม และยิงสัญญาณเตือนฉุกเฉิน</p>
-          </div>
-
-        </div>
-
-        <!-- Edge AI Privacy Callout -->
-        <div class="glass-card" style="padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid #06b6d4;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
           <div>
-            <h4 style="font-size: 1.1rem; font-weight: 600; color: #fff; margin-bottom: 0.25rem;">🔒 สถาปัตยกรรมไร้เซิร์ฟเวอร์ (Zero Cloud Streaming)</h4>
-            <p style="font-size: 0.85rem; color: #94a3b8;">
-              ภาพจากกล้องของผู้ใช้จะถูกประมวลผลบนชิปประมวลผลของเครื่อง (Local WebAssembly) <strong>ไม่มีการส่งรูปภาพหรือสตรีมวิดีโอออกนอกเครื่องแม้แต่เฟรมเดียว</strong>
+            <span class="font-mono" style="color: var(--accent-crimson); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              SECTION 01 // CRITICAL ROAD RISK
+            </span>
+            <h2 style="font-size: 2.25rem; font-weight: 700; margin-top: 0.25rem;">
+              ฟิสิกส์ของการหลับใน: ความเสี่ยงระดับเสี้ยววินาที
+            </h2>
+          </div>
+          <div class="font-mono" style="font-size: 0.75rem; color: var(--text-muted);">
+            HIGHWAY STATISTICAL MODEL
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 1.5rem;">
+          
+          <!-- Interactive Physics Calculator -->
+          <div class="cad-panel" style="padding: 1.75rem;">
+            <div class="reticle-corner reticle-tl"></div>
+            <div class="reticle-corner reticle-br"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+              <span class="font-mono" style="font-size: 0.8rem; font-weight: 700; color: var(--text-main);">
+                CALCULATOR: MICROSLEEP BLIND DISTANCE
+              </span>
+              <span class="font-mono" style="font-size: 0.75rem; color: var(--accent-cyan);">D = (V / 3.6) × T</span>
+            </div>
+
+            <!-- Controls -->
+            <div style="margin-bottom: 1.25rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.4rem;">
+                <span style="color: var(--text-muted);">ความเร็วรถขณะขับขี่ (Vehicle Speed):</span>
+                <span id="speed-display" class="font-mono" style="color: var(--accent-cyan); font-weight: 700;">90 km/h</span>
+              </div>
+              <input id="speed-slider" type="range" min="50" max="140" step="5" value="90">
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 0.4rem;">
+                <span style="color: var(--text-muted);">ระยะเวลาที่หลับใน / วูบปิดตา (Microsleep Duration):</span>
+                <span id="time-display" class="font-mono" style="color: var(--accent-amber); font-weight: 700;">2.0 วินาที</span>
+              </div>
+              <input id="time-slider" type="range" min="1.0" max="4.0" step="0.5" value="2.0">
+            </div>
+
+            <!-- Result Box -->
+            <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08); border-radius: 0.5rem; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span class="font-mono" style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; display: block;">ระยะทางที่รถแล่นโดยไร้การควบคุม (Blind Distance)</span>
+                <div id="blind-dist-val" class="font-mono" style="font-size: 2.75rem; font-weight: 800; color: var(--accent-crimson); line-height: 1.1; margin-top: 0.25rem;">
+                  50.0 ม.
+                </div>
+              </div>
+              <div style="text-align: right; max-width: 200px;">
+                <span id="blind-dist-comparison" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; display: block;">
+                  เทียบเท่าความยาวของรถประจำทางประมาณ 4 คันเรียงต่อกันโดยไม่มีผู้ขับเบรก
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Problem vs Solution Analysis -->
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            
+            <div class="cad-panel" style="padding: 1.25rem; border-left: 3px solid var(--accent-crimson);">
+              <span class="font-mono" style="font-size: 0.75rem; font-weight: 700; color: var(--accent-crimson);">ข้อจำกัดของระบบเดิมในท้องตลาด</span>
+              <ul style="list-style: none; margin-top: 0.5rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;">
+                <li>• ต้องติดตั้งกล้องอินฟราเรดหรือเซนเซอร์เฉพาะทาง (ต้นทุนสูงหลักหมื่น)</li>
+                <li>• รองรับเฉพาะรถยนต์หรูรุ่นท็อป รถยนต์ทั่วไปเข้าไม่ถึง</li>
+                <li>• ติดตั้งเคลื่อนย้ายยาก ไม่สามารถแชร์ใช้งานข้ามอุปกรณ์ได้</li>
+              </ul>
+            </div>
+
+            <div class="cad-panel" style="padding: 1.25rem; border-left: 3px solid var(--accent-emerald);">
+              <span class="font-mono" style="font-size: 0.75rem; font-weight: 700; color: var(--accent-emerald);">แนวทางแก้ปัญหาของ DriverGuard AI</span>
+              <ul style="list-style: none; margin-top: 0.5rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;">
+                <li>• <strong>ต้นทุน 0 บาท:</strong> ใช้เพียงสมาร์ตโฟนหรือโน้ตบุ๊กที่มีอยู่แล้ว</li>
+                <li>• <strong>รันบนเบราว์เซอร์:</strong> ไม่ต้องติดตั้งซอฟต์แวร์ ไม่ต้องผ่าน App Store</li>
+                <li>• <strong>Real-time ปลอดภัย:</strong> ประมวลผลบนเครื่อง 100% ไม่ส่งภาพขึ้นคลาวด์</li>
+              </ul>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ---------------- SLIDE 3: SYSTEM ARCHITECTURE & PIPELINE ---------------- -->
+    <section class="slide" data-slide="3" data-title="System Architecture & Edge Pipeline">
+      <div style="width: 100%; max-width: 1080px;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+          <div>
+            <span class="font-mono" style="color: var(--accent-cyan); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              SECTION 02 // TECHNICAL ARCHITECTURE
+            </span>
+            <h2 style="font-size: 2.25rem; font-weight: 700; margin-top: 0.25rem;">
+              สถาปัตยกรรมการประมวลผล 5 ขั้นตอน (Pipeline)
+            </h2>
+          </div>
+          <div class="font-mono" style="font-size: 0.75rem; color: var(--accent-emerald);">
+            FRAME BUDGET: &lt; 33.3ms (30 FPS)
+          </div>
+        </div>
+
+        <!-- 5 Steps Flow Layout -->
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.85rem; margin-bottom: 1.5rem;">
+          
+          <div class="cad-panel-interactive" style="padding: 1.25rem; cursor: pointer;" onclick="deck.inspectPipeline(0)">
+            <span class="font-mono" style="font-size: 0.7rem; color: var(--accent-cyan); font-weight: 700;">STAGE 01</span>
+            <h4 style="font-size: 0.95rem; font-weight: 600; margin: 0.4rem 0 0.35rem; color: #fff;">Video Ingest</h4>
+            <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">WebRTC getUserMedia 640×480 @ 30 FPS</p>
+            <div class="font-mono" style="font-size: 0.68rem; color: #64748b; margin-top: 0.5rem;">ZERO LATENCY</div>
+          </div>
+
+          <div class="cad-panel-interactive" style="padding: 1.25rem; cursor: pointer;" onclick="deck.inspectPipeline(1)">
+            <span class="font-mono" style="font-size: 0.7rem; color: #60a5fa; font-weight: 700;">STAGE 02</span>
+            <h4 style="font-size: 0.95rem; font-weight: 600; margin: 0.4rem 0 0.35rem; color: #fff;">Mesh Inference</h4>
+            <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">MediaPipe FaceMesh ตรวจจับ 478 Landmark 3D</p>
+            <div class="font-mono" style="font-size: 0.68rem; color: #64748b; margin-top: 0.5rem;">GPU WEBGL SHADER</div>
+          </div>
+
+          <div class="cad-panel-interactive" style="padding: 1.25rem; cursor: pointer;" onclick="deck.inspectPipeline(2)">
+            <span class="font-mono" style="font-size: 0.7rem; color: var(--accent-purple); font-weight: 700;">STAGE 03</span>
+            <h4 style="font-size: 0.95rem; font-weight: 600; margin: 0.4rem 0 0.35rem; color: #fff;">Feature Extract</h4>
+            <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">ดึงเฉพาะพิกัดตา 6 จุด (P1–P6) และปาก 4 จุด</p>
+            <div class="font-mono" style="font-size: 0.68rem; color: #64748b; margin-top: 0.5rem;">EUCLIDEAN NORM</div>
+          </div>
+
+          <div class="cad-panel-interactive" style="padding: 1.25rem; cursor: pointer;" onclick="deck.inspectPipeline(3)">
+            <span class="font-mono" style="font-size: 0.7rem; color: var(--accent-amber); font-weight: 700;">STAGE 04</span>
+            <h4 style="font-size: 0.95rem; font-weight: 600; margin: 0.4rem 0 0.35rem; color: #fff;">Temporal Logic</h4>
+            <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">เก็บบัฟเฟอร์เวลา 45 เฟรมเพื่อแยกการกะพริบตา</p>
+            <div class="font-mono" style="font-size: 0.68rem; color: #64748b; margin-top: 0.5rem;">DEBOUNCE FILTER</div>
+          </div>
+
+          <div class="cad-panel-interactive" style="padding: 1.25rem; cursor: pointer;" onclick="deck.inspectPipeline(4)">
+            <span class="font-mono" style="font-size: 0.7rem; color: var(--accent-crimson); font-weight: 700;">STAGE 05</span>
+            <h4 style="font-size: 0.95rem; font-weight: 600; margin: 0.4rem 0 0.35rem; color: #fff;">Dual Dispatch</h4>
+            <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">ขับสัญญาณไซเรน 880Hz + เสียงเตือนภาษาไทย</p>
+            <div class="font-mono" style="font-size: 0.68rem; color: #64748b; margin-top: 0.5rem;">WEB AUDIO & SPEECH</div>
+          </div>
+
+        </div>
+
+        <!-- Detail Inspector Bar -->
+        <div id="pipeline-inspector-card" class="cad-panel" style="padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4);">
+          <div>
+            <span id="pipeline-stage-tag" class="font-mono" style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 700;">STAGE TELEMETRY // STAGE 01</span>
+            <div id="pipeline-stage-title" style="font-size: 1.1rem; font-weight: 600; color: #ffffff; margin-top: 0.2rem;">
+              Local WebRTC Video Acquisition (Zero Cloud Ingestion)
+            </div>
+            <p id="pipeline-stage-desc" style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.25rem;">
+              สตรีมวิดีโอจากกล้องเว็บแคมจะถูกส่งตรงเข้าสู่หน่วยความจำ RAM ของเครื่องผ่าน Web API ในรูปแบบ RGBA Canvas โดยไม่มีการบีบอัดส่งข้ามโครงข่ายอินเทอร์เน็ตแม้แต่ไบต์เดียว
             </p>
           </div>
-          <span style="font-size: 0.75rem; font-weight: 700; color: #10b981; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); padding: 0.4rem 0.8rem; border-radius: 9999px; white-space: nowrap;">
-            100% Privacy-Preserving
-          </span>
+          <div style="text-align: right; min-width: 140px;">
+            <span class="font-mono" style="font-size: 0.7rem; color: var(--accent-emerald); background: rgba(0,230,118,0.1); border: 1px solid rgba(0,230,118,0.3); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">
+              100% PRIVATE
+            </span>
+          </div>
         </div>
 
       </div>
     </section>
 
-    <!-- ---------------- SLIDE 4: THE MATHEMATICS & INTERACTIVE SIMULATOR ---------------- -->
-    <section class="slide" data-slide="4">
-      <div style="width: 100%; max-width: 1050px;">
+    <!-- ---------------- SLIDE 4: MATHEMATICS & INTERACTIVE SIMULATOR (ลูกเล่นจัดเต็ม) ---------------- -->
+    <section class="slide" data-slide="4" data-title="Core Mathematics & Live Simulator">
+      <div style="width: 100%; max-width: 1100px;">
         
-        <div style="margin-bottom: 1.5rem;">
-          <span style="color: #a855f7; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Algorithm & Mathematics</span>
-          <h2 style="font-size: 2.5rem; font-weight: 700; margin-top: 0.25rem;">สูตรคณิตศาสตร์: Eye Aspect Ratio (EAR)</h2>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.25rem;">
+          <div>
+            <span class="font-mono" style="color: var(--accent-purple); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              SECTION 03 // ALGORITHM & BIOMETRIC GEOMETRY
+            </span>
+            <h2 style="font-size: 2.15rem; font-weight: 700; margin-top: 0.25rem;">
+              สูตรคณิตศาสตร์ Eye Aspect Ratio (EAR) & เครื่องจำลองสด
+            </h2>
+          </div>
+          <div class="font-mono" style="font-size: 0.75rem; color: var(--accent-cyan);">
+            SOUKUPOVÁ & ČECH (2016)
+          </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.5rem; align-items: stretch;">
+        <div style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 1.25rem; align-items: stretch;">
           
-          <!-- Formula & Theory -->
-          <div class="glass-card" style="padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <!-- Theory & Equation Column -->
+          <div class="cad-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-              <span style="font-size: 0.75rem; color: #a855f7; font-weight: 700; text-transform: uppercase;">Soukupová & Čech (2016)</span>
-              <h3 style="font-size: 1.25rem; font-weight: 600; margin: 0.5rem 0 1rem; color: #ffffff;">การวัดระยะห่างแนวตั้งเทียบแนวนอน</h3>
-              
-              <!-- Formula Box -->
-              <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1rem 1.5rem; text-align: center; margin-bottom: 1.25rem;">
-                <div class="font-mono" style="font-size: 1.35rem; color: #67e8f9; font-weight: 700;">
+              <span class="font-mono" style="font-size: 0.7rem; color: var(--accent-cyan); text-transform: uppercase; font-weight: 700;">Mathematical Foundation</span>
+              <h3 style="font-size: 1.1rem; font-weight: 600; margin: 0.35rem 0 0.85rem; color: #ffffff;">การคำนวณสัดส่วนความกว้างต่อความสูงเปลือกตา</h3>
+
+              <!-- LaTeX Equation Card -->
+              <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.35rem; padding: 0.85rem 1.25rem; text-align: center; margin-bottom: 1rem;">
+                <div class="font-mono" style="font-size: 1.15rem; color: var(--accent-cyan); font-weight: 700;">
                   EAR = (||p₂ - p₆|| + ||p₃ - p₅||) / (2 × ||p₁ - p₄||)
                 </div>
               </div>
 
-              <ul style="list-style: none; font-size: 0.85rem; color: #cbd5e1; line-height: 1.8;">
-                <li>• <strong>p₁, p₄:</strong> พิกัดหัวตาและหางตา (ความกว้างแนวนอน)</li>
-                <li>• <strong>p₂, p₆ และ p₃, p₅:</strong> พิกัดเปลือกตาบนและล่าง (ความสูงแนวตั้ง 2 จุด)</li>
-                <li>• <strong>ลืมตาปกติ:</strong> ค่า EAR เฉลี่ยอยู่ที่ <span style="color: #34d399; font-weight: 700;">0.28 – 0.35</span></li>
-                <li>• <strong>หลับตา / สัปหงก:</strong> ค่า EAR จะดิ่งลงต่ำกว่า <span style="color: #f87171; font-weight: 700;">0.22</span></li>
-              </ul>
+              <!-- Landmark Definitions -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+                <div style="padding: 0.5rem; background: rgba(255,255,255,0.02); border-radius: 0.25rem; border: 1px solid rgba(255,255,255,0.05);">
+                  <strong style="color: var(--text-main);">p₁, p₄:</strong> หัวตา & หางตา (แนวนอน)
+                </div>
+                <div style="padding: 0.5rem; background: rgba(255,255,255,0.02); border-radius: 0.25rem; border: 1px solid rgba(255,255,255,0.05);">
+                  <strong style="color: var(--text-main);">p₂/p₆, p₃/p₅:</strong> เปลือกตาบน-ล่าง
+                </div>
+              </div>
+
+              <!-- Threshold Rules -->
+              <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.6;">
+                <div>• <span class="font-mono" style="color: var(--accent-emerald); font-weight: 700;">EAR ≥ 0.26:</span> สภาวะตื่นตัวปกติ (Normal Awake)</div>
+                <div>• <span class="font-mono" style="color: var(--accent-amber); font-weight: 700;">0.22 ≤ EAR &lt; 0.26:</span> เริ่มมีอาการเหนื่อยล้า (Drowsiness Warning)</div>
+                <div>• <span class="font-mono" style="color: var(--accent-crimson); font-weight: 700;">EAR &lt; 0.22 (≥ 1.5 วินาที):</span> ยืนยันหลับใน (Microsleep Alarm)</div>
+              </div>
             </div>
 
-            <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(6,182,212,0.1); border-radius: 0.5rem; font-size: 0.8rem; color: #22d3ee;">
-              ⏱️ <strong>การตัดสินใจ:</strong> หาก EAR &lt; 0.22 ค้างต่อเนื่อง <strong>≥ 1.5 วินาที</strong> ระบบจะยืนยันว่าเป็น "หลับใน" (Microsleep) และส่งเสียงไซเรนเตือนทันที!
+            <!-- Decision Rule Callout -->
+            <div style="margin-top: 1rem; padding: 0.65rem 0.85rem; background: rgba(0, 229, 255, 0.05); border-left: 3px solid var(--accent-cyan); font-size: 0.75rem; color: var(--text-muted);">
+              <strong>Temporal Filter:</strong> การกะพริบตาธรรมชาติใช้เวลาเพียง <span class="font-mono" style="color: #fff;">100–300ms</span> ระบบจึงไม่ส่งสัญญาณเตือนหลอกจากการกะพริบตาทั่วไป
             </div>
           </div>
 
-          <!-- Interactive Live EAR Simulator -->
-          <div class="glass-card" style="padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(6,182,212,0.3);">
+          <!-- Interactive Simulator & Waveform Column -->
+          <div class="cad-panel" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; border-color: rgba(0, 229, 255, 0.25);">
+            <div class="reticle-corner reticle-tl"></div>
+            <div class="reticle-corner reticle-tr"></div>
+            
             <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <span style="font-size: 0.85rem; font-weight: 700; color: #f1f5f9;">🧪 จำลองการเปิด-ปิดตา (Live Simulator)</span>
-                <span id="sim-status-badge" style="font-size: 0.75rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 9999px; background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4);">
-                  ตื่นตัวปกติ (NORMAL)
+              <!-- Simulator Header -->
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <span class="font-mono" style="font-size: 0.75rem; font-weight: 700; color: var(--text-main);">
+                  LIVE TELEMETRY & EYE VECTOR SIMULATOR
+                </span>
+                <span id="sim-status-badge" class="font-mono" style="font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.5rem; border-radius: 0.25rem; background: rgba(0,230,118,0.15); color: var(--accent-emerald); border: 1px solid rgba(0,230,118,0.3);">
+                  NORMAL AWAKE
                 </span>
               </div>
 
-              <!-- Animated Eye Vector -->
-              <div style="width: 100%; height: 110px; background: #070d19; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
-                <svg id="sim-eye-svg" width="160" height="90" viewBox="0 0 160 90">
-                  <!-- Eye Sclera Outline -->
-                  <path id="sim-eye-outline" d="M 20 45 Q 80 15 140 45 Q 80 75 20 45 Z" fill="rgba(255,255,255,0.08)" stroke="#22d3ee" stroke-width="2.5"/>
-                  <!-- Iris & Pupil -->
-                  <circle id="sim-iris" cx="80" cy="45" r="16" fill="#0284c7"/>
-                  <circle id="sim-pupil" cx="80" cy="45" r="7" fill="#0f172a"/>
-                  <!-- Landmark Keypoint Markers -->
-                  <circle cx="20" cy="45" r="3" fill="#f43f5e"/>
-                  <circle cx="140" cy="45" r="3" fill="#f43f5e"/>
-                  <circle id="pt-top1" cx="60" cy="25" r="3" fill="#38bdf8"/>
-                  <circle id="pt-top2" cx="100" cy="25" r="3" fill="#38bdf8"/>
-                  <circle id="pt-bot1" cx="60" cy="65" r="3" fill="#38bdf8"/>
-                  <circle id="pt-bot2" cx="100" cy="65" r="3" fill="#38bdf8"/>
+              <!-- Animated Vector Eye Graphic -->
+              <div style="width: 100%; height: 95px; background: #04060a; border-radius: 0.35rem; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 0.75rem;">
+                <svg id="sim-eye-svg" width="180" height="85" viewBox="0 0 180 85">
+                  <path id="sim-eye-outline" d="M 25 42 Q 90 12 155 42 Q 90 72 25 42 Z" fill="rgba(255,255,255,0.06)" stroke="var(--accent-cyan)" stroke-width="2"/>
+                  <circle id="sim-iris" cx="90" cy="42" r="15" fill="#0284c7"/>
+                  <circle id="sim-pupil" cx="90" cy="42" r="6" fill="#0f172a"/>
+                  <!-- Landmark Keypoints with indices -->
+                  <circle cx="25" cy="42" r="3" fill="#ff3b5c"/>
+                  <circle cx="155" cy="42" r="3" fill="#ff3b5c"/>
+                  <circle id="pt-top1" cx="70" cy="22" r="3" fill="#38bdf8"/>
+                  <circle id="pt-top2" cx="110" cy="22" r="3" fill="#38bdf8"/>
+                  <circle id="pt-bot1" cx="70" cy="62" r="3" fill="#38bdf8"/>
+                  <circle id="pt-bot2" cx="110" cy="62" r="3" fill="#38bdf8"/>
                 </svg>
               </div>
 
-              <!-- Simulator Slider -->
-              <div style="margin-top: 1.25rem;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem;">
-                  <span style="color: #94a3b8;">ลองเลื่อนระดับการเปิดตา (EAR):</span>
-                  <span id="sim-ear-val" class="font-mono" style="font-weight: 800; color: #22d3ee; font-size: 1.1rem;">0.30</span>
+              <!-- Real-Time Waveform Oscilloscope -->
+              <div style="margin-bottom: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.25rem;" class="font-mono">
+                  <span>EAR TIME-SERIES WAVEFORM</span>
+                  <span style="color: var(--accent-crimson);">THRESHOLD: 0.22</span>
                 </div>
-                <input id="sim-slider" type="range" min="0.08" max="0.38" step="0.01" value="0.30" style="width: 100%; accent-color: #06b6d4; cursor: pointer;">
+                <canvas id="sim-oscilloscope" width="480" height="70"></canvas>
+              </div>
+
+              <!-- Simulator Controls -->
+              <div style="margin-bottom: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                  <span style="color: var(--text-muted);">ปรับระดับการเปิดตา (EAR):</span>
+                  <span id="sim-ear-val" class="font-mono" style="font-weight: 800; color: var(--accent-cyan); font-size: 1rem;">0.30</span>
+                </div>
+                <input id="sim-slider" type="range" min="0.08" max="0.38" step="0.01" value="0.30">
               </div>
             </div>
 
-            <p style="font-size: 0.75rem; color: #64748b; text-align: center; margin-top: 0.5rem;">
-              เลื่อนไปทางซ้ายเพื่อแกล้งหลับตา แล้วสังเกตการเปลี่ยนสถานะ
-            </p>
+            <!-- 1-Click Simulation Scenario Presets -->
+            <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.75rem; display: flex; gap: 0.5rem;">
+              <button id="sim-preset-blink" class="nav-ctrl-btn" style="flex: 1; justify-content: center; font-size: 0.72rem;">
+                ▶ กะพริบตา (0.2s)
+              </button>
+              <button id="sim-preset-drowsy" class="nav-ctrl-btn" style="flex: 1; justify-content: center; font-size: 0.72rem; color: var(--accent-amber);">
+                ▶ สัปหงก (1.0s)
+              </button>
+              <button id="sim-preset-alarm" class="nav-ctrl-btn" style="flex: 1; justify-content: center; font-size: 0.72rem; color: var(--accent-crimson);">
+                ▶ หลับใน (2.5s)
+              </button>
+            </div>
+
           </div>
 
         </div>
@@ -463,158 +761,337 @@
       </div>
     </section>
 
-    <!-- ---------------- SLIDE 5: ENGINEERING HIGHLIGHTS ---------------- -->
-    <section class="slide" data-slide="5">
-      <div style="width: 100%; max-width: 1050px;">
+    <!-- ---------------- SLIDE 5: ENGINEERING FEATS & LIVE AUDIO TEST ---------------- -->
+    <section class="slide" data-slide="5" data-title="Engineering Feats & Live Audio">
+      <div style="width: 100%; max-width: 1080px;">
         
-        <div style="margin-bottom: 2rem;">
-          <span style="color: #10b981; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Engineering Excellence</span>
-          <h2 style="font-size: 2.75rem; font-weight: 700; margin-top: 0.25rem;">จุดเด่นทางวิศวกรรม & ความพร้อมใช้งานจริง</h2>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+          <div>
+            <span class="font-mono" style="color: var(--accent-emerald); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              SECTION 04 // ENGINEERING CRAFT & SOUND ARCHITECTURE
+            </span>
+            <h2 style="font-size: 2.25rem; font-weight: 700; margin-top: 0.25rem;">
+              จุดเด่นทางวิศวกรรม & การสังเคราะห์เสียงสด
+            </h2>
+          </div>
+          <div class="font-mono" style="font-size: 0.75rem; color: var(--text-muted);">
+            BUNDLE: 46 kB // ZERO EXTERNAL MEDIA
+          </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
           
-          <div class="glass-card" style="padding: 1.75rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-              <span style="font-size: 1.5rem;">⚡</span>
-              <h3 style="font-size: 1.25rem; font-weight: 600; color: #fff;">Ultra-Lightweight & Fast</h3>
-            </div>
-            <p style="font-size: 0.9rem; color: #94a3b8; line-height: 1.6;">
-              ขนาดชุดคำสั่ง JavaScript เพียง <strong>46 kB</strong> (Gzip 14 kB) ส่งผลให้ดาวน์โหลดและเปิดขึ้นบนมือถือได้ในเวลาไม่ถึง 0.5 วินาที แม้ใช้งานผ่านเน็ต 4G ทั่วไป
+          <!-- Pillar 1: Bundle & Performance -->
+          <div class="cad-panel" style="padding: 1.5rem;">
+            <div class="reticle-corner reticle-tl"></div>
+            <span class="font-mono" style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 700;">METRIC 01 // LIGHTWEIGHT FOOTPRINT</span>
+            <div style="font-size: 1.15rem; font-weight: 600; margin: 0.4rem 0 0.35rem; color: #ffffff;">ขนาดสคริปต์รวมเพียง 46 kB (Gzip 14 kB)</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.6;">
+              ตัด Library ภายนอกที่ไม่จำเป็นออกทั้งหมด เขียนอัลกอริทึมเรขาคณิตเวกเตอร์ด้วย Vanilla JavaScript โหลดหน้าเว็บและเริ่มวิเคราะห์ภาพได้ภายใน <strong>400 มิลลิวินาที</strong> แม้ใช้งานบนเครือข่ายมือถือ 4G ทั่วไป
             </p>
           </div>
 
-          <div class="glass-card" style="padding: 1.75rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-              <span style="font-size: 1.5rem;">🔊</span>
-              <h3 style="font-size: 1.25rem; font-weight: 600; color: #fff;">Zero-Dependency Audio Alarm</h3>
-            </div>
-            <p style="font-size: 0.9rem; color: #94a3b8; line-height: 1.6;">
-              ใช้ <strong>Web Audio API Oscillator</strong> สังเคราะห์ความถี่เสียงไซเรนสดๆ (880Hz / 1320Hz) ในเครื่อง ไม่ต้องโหลดไฟล์ MP3 ภายนอก หมดปัญหาเสียงไม่ดังหรือไฟล์หาไม่เจอ 100%
+          <!-- Pillar 2: Audio Synthesis -->
+          <div class="cad-panel" style="padding: 1.5rem;">
+            <div class="reticle-corner reticle-tl"></div>
+            <span class="font-mono" style="font-size: 0.72rem; color: var(--accent-emerald); font-weight: 700;">METRIC 02 // ZERO-DEPENDENCY AUDIO</span>
+            <div style="font-size: 1.15rem; font-weight: 600; margin: 0.4rem 0 0.35rem; color: #ffffff;">Web Audio API Oscillator ไร้ไฟล์เสียง MP3</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.6;">
+              ใช้คลื่นเสียงสังเคราะห์รูปฟันเลื่อย (Sawtooth Wave) สลับความถี่ 880Hz และ 1320Hz สดในชิปเสียงของอุปกรณ์ แก้ปัญหาไฟล์ MP3 โหลดไม่ทัน เสียงดีเลย์ หรือเปิดไม่ติดบนเบราว์เซอร์ 100%
             </p>
           </div>
 
-          <div class="glass-card" style="padding: 1.75rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-              <span style="font-size: 1.5rem;">🗣️</span>
-              <h3 style="font-size: 1.25rem; font-weight: 600; color: #fff;">Dual-Alert System (ไซเรน + เสียงไทย)</h3>
-            </div>
-            <p style="font-size: 0.9rem; color: #94a3b8; line-height: 1.6;">
-              นอกจากเสียงไซเรน ยังผสมผสาน <strong>Web Speech Synthesis ภาษาไทย</strong> ปลุกคนขับด้วยคำสั่งเสียงเตือนสติ พร้อมไฟกระพริบฉุกเฉิน (Emergency Strobe Overlay)
+          <!-- Pillar 3: Speech Synthesis -->
+          <div class="cad-panel" style="padding: 1.5rem;">
+            <div class="reticle-corner reticle-tl"></div>
+            <span class="font-mono" style="font-size: 0.72rem; color: var(--accent-amber); font-weight: 700;">METRIC 03 // DUAL-ALERT SPEECH</span>
+            <div style="font-size: 1.15rem; font-weight: 600; margin: 0.4rem 0 0.35rem; color: #ffffff;">ผสานระบบสั่งการเสียงพูดเตือนสติภาษาไทย</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.6;">
+              ใช้ Web Speech Synthesis (`SpeechSynthesisUtterance`) ส่งเสียงสั่งการเตือนสติเป็นระยะ ร่วมกับ Emergency Strobe Overlay สีแดงกระพริบทั่วหน้าจอเพื่อกระตุ้นประสาทตาของผู้ขับขี่
             </p>
           </div>
 
-          <div class="glass-card" style="padding: 1.75rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-              <span style="font-size: 1.5rem;">🥱</span>
-              <h3 style="font-size: 1.25rem; font-weight: 600; color: #fff;">ตรวจจับอาการหาว (MAR) & สัปหงก</h3>
-            </div>
-            <p style="font-size: 0.9rem; color: #94a3b8; line-height: 1.6;">
-              ระบบไม่เพียงดูดวงตา แต่มีอัลกอริทึม Mouth Aspect Ratio (MAR) เตือนเมื่อผู้ขับขี่หาวบ่อยครั้ง และตรวจจับมุมการก้มคอ (Head Slump) ก่อนที่จะเกิดอุบัติเหตุ
+          <!-- Pillar 4: Multimodal Metrics -->
+          <div class="cad-panel" style="padding: 1.5rem;">
+            <div class="reticle-corner reticle-tl"></div>
+            <span class="font-mono" style="font-size: 0.72rem; color: var(--accent-purple); font-weight: 700;">METRIC 04 // MULTI-MODAL DETECTION</span>
+            <div style="font-size: 1.15rem; font-weight: 600; margin: 0.4rem 0 0.35rem; color: #ffffff;">Mouth Aspect Ratio (MAR) & Head Slump</div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.6;">
+              ไม่เพียงตรวจจับการปิดเปลือกตา แต่ตรวจวัดพฤติกรรมการหาวต่อเนื่อง (MAR > 0.65) และมุมการก้มคอสัปหงก (Head Pitch) ประเมินคะแนนความตื่นตัว (Driver Alertness Score 0–100%)
             </p>
           </div>
 
+        </div>
+
+        <!-- Live Audio Soundboard Sandbox -->
+        <div class="cad-panel" style="padding: 1.25rem 1.75rem; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5);">
+          <div>
+            <span class="font-mono" style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 700;">LIVE AUDIO ENGINE TEST // SOUND DEMO</span>
+            <div style="font-size: 0.95rem; font-weight: 600; color: #ffffff; margin-top: 0.15rem;">
+              ทดสอบการกำเนิดเสียงจริงผ่าน Web Audio & Speech ในสไลด์
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button id="test-siren-btn" class="btn-action-tech" style="color: var(--accent-crimson); border-color: rgba(255, 59, 92, 0.4); background: rgba(255, 59, 92, 0.1);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span>ทดสอบเสียงไซเรนสังเคราะห์</span>
+            </button>
+
+            <button id="test-speech-btn" class="btn-action-tech" style="color: var(--accent-cyan); border-color: rgba(0, 229, 255, 0.4); background: rgba(0, 229, 255, 0.1);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>ทดสอบเสียงพูดภาษาไทย</span>
+            </button>
+          </div>
         </div>
 
       </div>
     </section>
 
-    <!-- ---------------- SLIDE 6: LIVE AUDIENCE INTERACTION & QR CODE ---------------- -->
-    <section class="slide" data-slide="6">
-      <div style="width: 100%; max-width: 950px; text-align: center; display: flex; flex-direction: column; align-items: center;">
+    <!-- ---------------- SLIDE 6: AUDIENCE TESTING & LIVE QR DEMO ---------------- -->
+    <section class="slide" data-slide="6" data-title="Live Audience Evaluation & QR Code">
+      <div style="width: 100%; max-width: 1080px; text-align: center; display: flex; flex-direction: column; align-items: center;">
         
-        <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 1rem; border-radius: 9999px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); margin-bottom: 1rem;">
-          <span style="width: 8px; height: 8px; border-radius: 9999px; background: #10b981;"></span>
-          <span style="font-size: 0.85rem; color: #34d399; font-weight: 600;">Live Interactive Demo</span>
-        </div>
-
-        <h2 style="font-size: 3rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.02em;">
-          ทดลองใช้งานจริงด้วยโทรศัพท์ของคุณ
-        </h2>
-
-        <p style="font-size: 1.15rem; color: #94a3b8; margin-bottom: 2rem;">
-          ขอเชิญอาจารย์และเพื่อนๆ สแกน QR Code นี้ เพื่อเปิดใช้งานบนมือถือสดๆ ตอนนี้ได้เลยครับ!
-        </p>
-
-        <!-- QR Code Display Box -->
-        <div class="glass-card qr-frame" style="padding: 1.5rem; display: inline-flex; flex-direction: column; align-items: center; background: rgba(10, 16, 30, 0.95); margin-bottom: 1.5rem;">
-          <div style="background: #ffffff; padding: 0.85rem; border-radius: 1rem; display: inline-block;">
-            <img src="/qr.svg" alt="Scan to open DriverGuard AI" style="width: 220px; height: 220px; display: block;">
-          </div>
-          
-          <a href="https://driverguard-ai.vercel.app/" target="_blank" class="font-mono" style="margin-top: 1rem; font-size: 0.95rem; color: #22d3ee; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
-            <span>https://driverguard-ai.vercel.app/</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          </a>
-        </div>
-
-        <!-- 3-Step Demo Instructions -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 780px; text-align: left;">
-          <div class="glass-card" style="padding: 1rem 1.25rem;">
-            <span style="font-weight: 800; color: #22d3ee; font-size: 1.1rem; display: block; margin-bottom: 0.2rem;">01</span>
-            <span style="font-size: 0.85rem; color: #cbd5e1;">สแกน QR Code ด้วยกล้องโทรศัพท์</span>
-          </div>
-          <div class="glass-card" style="padding: 1rem 1.25rem;">
-            <span style="font-weight: 800; color: #34d399; font-size: 1.1rem; display: block; margin-bottom: 0.2rem;">02</span>
-            <span style="font-size: 0.85rem; color: #cbd5e1;">กดปุ่ม <strong>"เริ่มระบบตรวจจับ"</strong> เพื่อเปิดกล้อง</span>
-          </div>
-          <div class="glass-card" style="padding: 1rem 1.25rem;">
-            <span style="font-weight: 800; color: #f43f5e; font-size: 1.1rem; display: block; margin-bottom: 0.2rem;">03</span>
-            <span style="font-size: 0.85rem; color: #cbd5e1;">แกล้งหลับตา 2 วินาทีเพื่อฟังเสียงเตือน!</span>
-          </div>
-        </div>
-
-        <div style="margin-top: 2rem;">
-          <span style="font-size: 0.95rem; color: #e2e8f0; font-weight: 500;">
-            ขอบคุณครับ • มีข้อเสนอแนะหรือคำถามเพิ่มเติมไหมครับ? 🙏
+        <div style="margin-bottom: 1.25rem;">
+          <span class="font-mono" style="color: var(--accent-emerald); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+            SECTION 05 // REAL-WORLD AUDIENCE DEPLOYMENT
           </span>
+          <h2 style="font-size: 2.75rem; font-weight: 800; margin-top: 0.25rem; letter-spacing: -0.02em;">
+            ทดลองใช้งานจริงด้วยสมาร์ตโฟนของคุณ
+          </h2>
+          <p style="font-size: 1.05rem; color: var(--text-muted); margin-top: 0.25rem;">
+            ขอเชิญอาจารย์และเพื่อนๆ เปิดกล้องโทรศัพท์แล้วสแกน QR Code ด้านล่างเพื่อทดลองระบบสดๆ ครับ
+          </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 320px 1fr; gap: 2rem; align-items: center; max-width: 900px; text-align: left; margin-bottom: 1.5rem;">
+          
+          <!-- High-Tech QR Viewfinder Frame -->
+          <div class="cad-panel" style="padding: 1.25rem; display: flex; flex-direction: column; align-items: center; background: rgba(13, 18, 31, 0.95);">
+            <div class="reticle-corner reticle-tl"></div>
+            <div class="reticle-corner reticle-tr"></div>
+            <div class="reticle-corner reticle-bl"></div>
+            <div class="reticle-corner reticle-br"></div>
+
+            <div class="qr-viewfinder">
+              <div class="qr-scan-line"></div>
+              <img src="/qr.svg" alt="Scan to launch DriverGuard AI" style="width: 210px; height: 210px; display: block;">
+            </div>
+
+            <div style="margin-top: 1rem; width: 100%; display: flex; flex-direction: column; gap: 0.5rem;">
+              <a href="https://driverguard-ai.vercel.app/" target="_blank" class="font-mono" style="font-size: 0.8rem; color: var(--accent-cyan); text-decoration: none; text-align: center; font-weight: 700; display: block;">
+                driverguard-ai.vercel.app
+              </a>
+
+              <button id="copy-url-btn" class="nav-ctrl-btn" style="width: 100%; justify-content: center; font-size: 0.75rem;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span id="copy-btn-text">คัดลอกลิงก์ (Copy URL)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 3-Step Verification Checklist -->
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            
+            <div class="cad-panel" style="padding: 1rem 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="font-mono" style="font-size: 0.95rem; font-weight: 800; color: var(--accent-cyan); background: rgba(0,229,255,0.1); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">
+                  01
+                </span>
+                <div>
+                  <h4 style="font-size: 0.95rem; font-weight: 600; color: #fff;">สแกน QR Code ด้วยกล้องมือถือ</h4>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem;">เปิดลิงก์ผ่าน Safari บน iOS หรือ Chrome บน Android โดยไม่ต้องดาวน์โหลดแอป</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="cad-panel" style="padding: 1rem 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="font-mono" style="font-size: 0.95rem; font-weight: 800; color: var(--accent-emerald); background: rgba(0,230,118,0.1); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">
+                  02
+                </span>
+                <div>
+                  <h4 style="font-size: 0.95rem; font-weight: 600; color: #fff;">กดปุ่ม "เริ่มระบบตรวจจับ" เพื่อเปิดกล้อง</h4>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem;">ระบบเริ่มประมวลผล Face Mesh ในเครื่องทันที ไม่มีภาพหลุดออกสู่ภายนอก</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="cad-panel" style="padding: 1rem 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="font-mono" style="font-size: 0.95rem; font-weight: 800; color: var(--accent-crimson); background: rgba(255,59,92,0.1); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">
+                  03
+                </span>
+                <div>
+                  <h4 style="font-size: 0.95rem; font-weight: 600; color: #fff;">ทดสอบแกล้งหลับตา 2 วินาที หรือแกล้งหาว</h4>
+                  <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem;">ฟังเสียงไซเรนสังเคราะห์และเสียงเตือนภาษาไทยแจ้งเตือนสดๆ จากโทรศัพท์ของคุณ</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conclusion celebration action -->
+            <div style="margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.85rem; color: var(--text-muted);">
+                ขอบคุณสำหรับการรับฟังครับ • ยินดีรับฟังทุกข้อเสนอแนะและตอบคำถามครับ
+              </span>
+              <button id="final-confetti-btn" class="btn-action-tech" style="color: var(--accent-emerald); border-color: rgba(0,230,118,0.4); background: rgba(0,230,118,0.1);">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>ยิงพลุฉลองจบการนำเสนอ</span>
+              </button>
+            </div>
+
+          </div>
+
         </div>
 
       </div>
     </section>
 
-  </div>
+  </main>
 
-  <!-- ================= DECK NAVIGATION DOCK ================= -->
-  <nav class="deck-nav">
-    <button id="prev-btn" class="nav-btn" title="Previous Slide (←)">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-      <span>ก่อนหน้า</span>
+  <!-- ================= MINIMAL FLOATING DECK CONTROLS ================= -->
+  <nav class="deck-nav-dock">
+    <button id="prev-btn" class="nav-ctrl-btn" title="Previous Slide (←)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>PREV</span>
     </button>
 
     <div style="display: flex; align-items: center; gap: 0.4rem; padding: 0 0.5rem;">
-      <span class="slide-dot active" data-target="1"></span>
-      <span class="slide-dot" data-target="2"></span>
-      <span class="slide-dot" data-target="3"></span>
-      <span class="slide-dot" data-target="4"></span>
-      <span class="slide-dot" data-target="5"></span>
-      <span class="slide-dot" data-target="6"></span>
+      <span class="slide-step-indicator active" data-target="1" title="Slide 1: Overview"></span>
+      <span class="slide-step-indicator" data-target="2" title="Slide 2: Physics"></span>
+      <span class="slide-step-indicator" data-target="3" title="Slide 3: Architecture"></span>
+      <span class="slide-step-indicator" data-target="4" title="Slide 4: Mathematics"></span>
+      <span class="slide-step-indicator" data-target="5" title="Slide 5: Engineering"></span>
+      <span class="slide-step-indicator" data-target="6" title="Slide 6: Live Demo"></span>
     </div>
 
-    <button id="next-btn" class="nav-btn" style="color: #22d3ee;" title="Next Slide (→ / Space)">
-      <span>ถัดไป</span>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    <button id="next-btn" class="nav-ctrl-btn" style="color: var(--accent-cyan); border-color: rgba(0,229,255,0.3);" title="Next Slide (→ / Space)">
+      <span>NEXT</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
     </button>
   </nav>
 
-  <!-- ================= PRESENTATION DECK SCRIPT ================= -->
+  <!-- ================= PRESENTER NOTES DRAWER ================= -->
+  <div id="notes-drawer" class="deck-drawer">
+    <div class="cad-panel" style="width: 90%; max-width: 640px; padding: 2rem; background: #0c101c; border-color: var(--accent-cyan);">
+      <div class="reticle-corner reticle-tl"></div>
+      <div class="reticle-corner reticle-tr"></div>
+      <div class="reticle-corner reticle-bl"></div>
+      <div class="reticle-corner reticle-br"></div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <span class="font-mono" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-cyan);">
+          SPEAKER NOTES // บันทึกช่วยจำสำหรับผู้บรรยาย
+        </span>
+        <button id="close-notes-btn" class="nav-ctrl-btn" style="padding: 0.2rem 0.5rem;">ESC / CLOSE</button>
+      </div>
+
+      <div id="notes-content" style="font-size: 0.95rem; color: #cbd5e1; line-height: 1.7; min-height: 180px; max-height: 380px; overflow-y: auto;">
+        <!-- Injected via JavaScript based on current slide -->
+      </div>
+
+      <div style="margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);" class="font-mono">
+        <span>PRESS [N] TO TOGGLE ANYTIME</span>
+        <span>SAU AI MINI-PROJECT DECK</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= KEYMAP GUIDE MODAL ================= -->
+  <div id="keymap-drawer" class="deck-drawer">
+    <div class="cad-panel" style="width: 90%; max-width: 520px; padding: 2rem; background: #0c101c; border-color: rgba(255,255,255,0.2);">
+      <div class="reticle-corner reticle-tl"></div>
+      <div class="reticle-corner reticle-tr"></div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <span class="font-mono" style="font-size: 0.85rem; font-weight: 700; color: #fff;">
+          KEYBOARD CONTROL MATRIX
+        </span>
+        <button id="close-keymap-btn" class="nav-ctrl-btn" style="padding: 0.2rem 0.5rem;">ESC / CLOSE</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.82rem;">
+        <div style="padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 0.35rem; border: 1px solid rgba(255,255,255,0.06);">
+          <strong class="font-mono" style="color: var(--accent-cyan);">[→] / [Space]</strong>
+          <div style="color: var(--text-muted); margin-top: 0.25rem;">สไลด์ถัดไป (Next Slide)</div>
+        </div>
+        <div style="padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 0.35rem; border: 1px solid rgba(255,255,255,0.06);">
+          <strong class="font-mono" style="color: var(--accent-cyan);">[←]</strong>
+          <div style="color: var(--text-muted); margin-top: 0.25rem;">สไลด์ก่อนหน้า (Prev Slide)</div>
+        </div>
+        <div style="padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 0.35rem; border: 1px solid rgba(255,255,255,0.06);">
+          <strong class="font-mono" style="color: var(--accent-emerald);">[F]</strong>
+          <div style="color: var(--text-muted); margin-top: 0.25rem;">สลับเต็มหน้าจอ (Fullscreen)</div>
+        </div>
+        <div style="padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 0.35rem; border: 1px solid rgba(255,255,255,0.06);">
+          <strong class="font-mono" style="color: var(--accent-amber);">[N]</strong>
+          <div style="color: var(--text-muted); margin-top: 0.25rem;">เปิด/ปิด สคริปต์ช่วยจำ (Notes)</div>
+        </div>
+        <div style="padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 0.35rem; border: 1px solid rgba(255,255,255,0.06);">
+          <strong class="font-mono" style="color: var(--accent-purple);">[1] - [6]</strong>
+          <div style="color: var(--text-muted); margin-top: 0.25rem;">กระโดดตรงไปยังสไลด์ที่ต้องการ</div>
+        </div>
+        <div style="padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 0.35rem; border: 1px solid rgba(255,255,255,0.06);">
+          <strong class="font-mono" style="color: var(--text-main);">[?]</strong>
+          <div style="color: var(--text-muted); margin-top: 0.25rem;">เปิดหน้าจอแสดงปุ่มลัดนี้</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PRESENTATION APPLICATION ENGINE ================= -->
   <script>
     class PresentationDeck {
       constructor() {
         this.slides = document.querySelectorAll('.slide');
-        this.dots = document.querySelectorAll('.slide-dot');
-        this.progressBar = document.getElementById('progress-bar');
-        this.counter = document.getElementById('slide-counter');
+        this.stepIndicators = document.querySelectorAll('.slide-step-indicator');
+        this.progressBar = document.getElementById('deck-progress-bar');
+        this.slideNumHeader = document.getElementById('header-slide-num');
+        this.slideTitleHeader = document.getElementById('header-slide-title');
         this.totalSlides = this.slides.length;
         this.currentSlide = 1;
 
+        // Presentation Stopwatch state
+        this.stopwatchSeconds = 0;
+        this.isStopwatchRunning = false;
+        this.stopwatchInterval = null;
+
+        // Oscilloscope Waveform buffer
+        this.waveformHistory = new Array(80).fill(0.30);
+        this.targetEar = 0.30;
+        this.currentEar = 0.30;
+
+        // Web Audio Synthesizer context for live sound preview
+        this.audioCtx = null;
+        this.isPlayingSiren = false;
+        this.sirenOsc = null;
+        this.sirenGain = null;
+        this.sirenTimer = null;
+
+        // Speaker Notes database per slide
+        this.speakerNotes = {
+          1: "<strong>สไลด์ 1 (บทนำ):</strong><br>• แนะนำตัวและชื่อโครงงาน 'DriverGuard AI'<br>• เน้นจุดเด่น: เป็นระบบ Edge Computer Vision ตรวจจับความง่วงบนเว็บ 100% ไม่ต้องซื้อเซนเซอร์ฮาร์ดแวร์เพิ่ม ไม่ส่งภาพขึ้นคลาวด์ มีความปลอดภัยเรื่อง Privacy สูงสุด",
+          2: "<strong>สไลด์ 2 (ฟิสิกส์และความเสี่ยง):</strong><br>• ชี้ให้เห็นตัวเลข: ที่ความเร็ว 90-100 กม./ชม. การหลับในเพียง 2 วินาที รถจะพุ่งไปข้างหน้าไกลถึง 50-55 เมตรโดยไม่มีใครคุมพวงมาลัย<br>• สามารถลองเลื่อน Slider เพื่อสาธิตให้คณะกรรมการเห็นตัวเลขระยะทางที่รถแล่นแบบไร้สติ",
+          3: "<strong>สไลด์ 3 (สถาปัตยกรรมระบบ):</strong><br>• อธิบาย 5 สเต็ป: รับภาพสด ➔ เข้าโมเดล 478 Landmark ➔ สกัดเวกเตอร์รอบตาและปาก ➔ วิเคราะห์มิติเวลา 45 เฟรม ➔ ส่งสัญญาณไซเรนและเสียงเตือน<br>• สามารถคลิกการ์ดแต่ละ Stage เพื่อโชว์ Technical Telemetry ด้านล่างได้",
+          4: "<strong>สไลด์ 4 (คณิตศาสตร์ & Live Simulator - ไฮไลต์):</strong><br>• อธิบายสูตร EAR ของ Soukupová & Čech (2016)<br>• <strong>ลูกเล่นเรียกเสียงว้าว:</strong> กดปุ่ม 'กะพริบตา (0.2s)' หรือ 'หลับใน (2.5s)' ด้านล่างขวา กราฟ Waveform และตาเวกเตอร์จะขยับแบบเรียลไทม์ พร้อมโชว์การเปลี่ยนสถานะเป็นสีแดงเตือน!",
+          5: "<strong>สไลด์ 5 (วิศวกรรม & ระบบเสียง):</strong><br>• เน้นย้ำขนาดไฟล์ชุดคำสั่งเบามากเพียง 46 kB โหลดไวสุดๆ<br>• <strong>ลูกเล่น:</strong> กดปุ่ม 'ทดสอบเสียงไซเรนสังเคราะห์' และ 'ทดสอบเสียงพูดภาษาไทย' เพื่อเปิดเสียงจริงให้อาจารย์ในห้องฟังได้ทันที",
+          6: "<strong>สไลด์ 6 (ทดสอบสด & ปิดการนำเสนอ):</strong><br>• เชิญชวนอาจารย์และเพื่อนๆ สแกน QR Code บนจอเพื่อเปิดทดสอบจริงผ่านกล้องมือถือของตัวเอง<br>• เมื่อนำเสนอเสร็จ ให้กดปุ่ม 'ยิงพลุฉลองจบการนำเสนอ' เพื่อปิดท้ายอย่างน่าประทับใจ"
+        };
+
         this.initControls();
+        this.initStopwatch();
+        this.initPhysicsCalculator();
         this.initSimulator();
+        this.initWaveformLoop();
+        this.initAudioSandbox();
+        this.updateSlideUI();
       }
 
       initControls() {
         // Keyboard Navigation
         window.addEventListener('keydown', (e) => {
+          if (e.target.tagName === 'INPUT') return;
+
           if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
             e.preventDefault();
             this.goToSlide(this.currentSlide + 1);
@@ -623,63 +1100,117 @@
             this.goToSlide(this.currentSlide - 1);
           } else if (e.key === 'f' || e.key === 'F') {
             this.toggleFullscreen();
+          } else if (e.key === 'n' || e.key === 'N') {
+            this.toggleNotes();
+          } else if (e.key === '?' || e.key === '/') {
+            this.toggleKeymap();
+          } else if (e.key === 'Escape') {
+            this.closeDrawers();
           } else if (e.key >= '1' && e.key <= '6') {
             this.goToSlide(parseInt(e.key));
           }
         });
 
         // Prev / Next Buttons
-        document.getElementById('prev-btn').addEventListener('click', () => {
-          this.goToSlide(this.currentSlide - 1);
-        });
+        document.getElementById('prev-btn').addEventListener('click', () => this.goToSlide(this.currentSlide - 1));
+        document.getElementById('next-btn').addEventListener('click', () => this.goToSlide(this.currentSlide + 1));
+        document.getElementById('start-deck-btn').addEventListener('click', () => this.goToSlide(2));
 
-        document.getElementById('next-btn').addEventListener('click', () => {
-          this.goToSlide(this.currentSlide + 1);
-        });
-
-        // Dot Navigation
-        this.dots.forEach(dot => {
-          dot.addEventListener('click', () => {
-            const target = parseInt(dot.getAttribute('data-target'));
+        // Step Indicators
+        this.stepIndicators.forEach(step => {
+          step.addEventListener('click', () => {
+            const target = parseInt(step.getAttribute('data-target'));
             this.goToSlide(target);
           });
         });
 
-        // Fullscreen Button
-        document.getElementById('fullscreen-btn').addEventListener('click', () => {
-          this.toggleFullscreen();
+        // Fullscreen
+        document.getElementById('fullscreen-btn').addEventListener('click', () => this.toggleFullscreen());
+
+        // Notes Drawer
+        document.getElementById('toggle-notes-btn').addEventListener('click', () => this.toggleNotes());
+        document.getElementById('close-notes-btn').addEventListener('click', () => this.closeDrawers());
+
+        // Keymap Modal
+        document.getElementById('toggle-keymap-btn').addEventListener('click', () => this.toggleKeymap());
+        document.getElementById('close-keymap-btn').addEventListener('click', () => this.closeDrawers());
+
+        // Copy URL
+        const copyBtn = document.getElementById('copy-url-btn');
+        const copyText = document.getElementById('copy-btn-text');
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText('https://driverguard-ai.vercel.app/').then(() => {
+            copyText.textContent = 'คัดลอกสำเร็จ! (Copied)';
+            setTimeout(() => { copyText.textContent = 'คัดลอกลิงก์ (Copy URL)'; }, 2000);
+          });
+        });
+
+        // Final Celebration Confetti Button
+        document.getElementById('final-confetti-btn').addEventListener('click', () => {
+          this.triggerConfetti();
         });
       }
 
       goToSlide(index) {
         if (index < 1 || index > this.totalSlides) return;
         this.currentSlide = index;
+        this.updateSlideUI();
 
-        // Update active class on slides
+        // Auto trigger celebratory confetti on final slide
+        if (this.currentSlide === 6) {
+          this.triggerConfetti();
+        }
+      }
+
+      updateSlideUI() {
+        // Toggle active slide
         this.slides.forEach((slide, i) => {
           slide.classList.toggle('active', i + 1 === this.currentSlide);
         });
 
-        // Update dots
-        this.dots.forEach((dot, i) => {
+        // Toggle step indicators
+        this.stepIndicators.forEach((dot, i) => {
           dot.classList.toggle('active', i + 1 === this.currentSlide);
         });
 
-        // Update Progress Bar
+        // Update Top Header Information
+        const activeSlide = this.slides[this.currentSlide - 1];
+        const title = activeSlide.getAttribute('data-title') || 'Presentation';
+        this.slideNumHeader.textContent = `SEC 0${this.currentSlide}`;
+        this.slideTitleHeader.textContent = title;
+
+        // Progress bar percentage
         const pct = (this.currentSlide / this.totalSlides) * 100;
         this.progressBar.style.width = `${pct}%`;
 
-        // Update Counter
-        this.counter.textContent = `0${this.currentSlide} / 0${this.totalSlides}`;
-
-        // Confetti on final slide!
-        if (this.currentSlide === this.totalSlides && typeof confetti === 'function') {
-          confetti({
-            particleCount: 50,
-            spread: 70,
-            origin: { y: 0.7 }
-          });
+        // Update Speaker Notes content
+        const notesContainer = document.getElementById('notes-content');
+        if (notesContainer) {
+          notesContainer.innerHTML = this.speakerNotes[this.currentSlide] || "ไม่มีบันทึกสำหรับสไลด์นี้";
         }
+      }
+
+      // ---------------- Presentation Stopwatch Timer ----------------
+      initStopwatch() {
+        const box = document.getElementById('deck-stopwatch-box');
+        const display = document.getElementById('deck-stopwatch-display');
+
+        box.addEventListener('click', () => {
+          if (!this.isStopwatchRunning) {
+            this.isStopwatchRunning = true;
+            box.style.borderColor = 'var(--accent-emerald)';
+            this.stopwatchInterval = setInterval(() => {
+              this.stopwatchSeconds++;
+              const mins = Math.floor(this.stopwatchSeconds / 60).toString().padStart(2, '0');
+              const secs = (this.stopwatchSeconds % 60).toString().padStart(2, '0');
+              display.textContent = `${mins}:${secs}`;
+            }, 1000);
+          } else {
+            this.isStopwatchRunning = false;
+            box.style.borderColor = 'var(--border-subtle)';
+            clearInterval(this.stopwatchInterval);
+          }
+        });
       }
 
       toggleFullscreen() {
@@ -690,7 +1221,102 @@
         }
       }
 
-      // Slide 4: Interactive Live EAR Eye Simulator
+      toggleNotes() {
+        const drawer = document.getElementById('notes-drawer');
+        drawer.classList.toggle('open');
+      }
+
+      toggleKeymap() {
+        const drawer = document.getElementById('keymap-drawer');
+        drawer.classList.toggle('open');
+      }
+
+      closeDrawers() {
+        document.getElementById('notes-drawer').classList.remove('open');
+        document.getElementById('keymap-drawer').classList.remove('open');
+      }
+
+      triggerConfetti() {
+        if (typeof confetti === 'function') {
+          confetti({
+            particleCount: 60,
+            spread: 80,
+            origin: { y: 0.7 },
+            colors: ['#00e5ff', '#00e676', '#f59e0b', '#ff3b5c']
+          });
+        }
+      }
+
+      // ---------------- Slide 2: Physics Calculator ----------------
+      initPhysicsCalculator() {
+        const speedSlider = document.getElementById('speed-slider');
+        const timeSlider = document.getElementById('time-slider');
+        const speedDisplay = document.getElementById('speed-display');
+        const timeDisplay = document.getElementById('time-display');
+        const distVal = document.getElementById('blind-dist-val');
+        const distDesc = document.getElementById('blind-dist-comparison');
+
+        const updatePhysics = () => {
+          const v = parseFloat(speedSlider.value);
+          const t = parseFloat(timeSlider.value);
+
+          speedDisplay.textContent = `${v} km/h`;
+          timeDisplay.textContent = `${t.toFixed(1)} วินาที`;
+
+          // Distance in meters: (v in km/h / 3.6) * t in seconds
+          const d = (v / 3.6) * t;
+          distVal.textContent = `${d.toFixed(1)} ม.`;
+
+          const busCount = Math.round(d / 12);
+          distDesc.textContent = `ที่ความเร็ว ${v} กม./ชม. รถจะวิ่งไปข้างหน้า ${d.toFixed(1)} เมตร (เทียบเท่ารถบัสประมาณ ${Math.max(1, busCount)} คันเรียงกัน) โดยปราศจากการมองเห็นทางของผู้ขับขี่`;
+        };
+
+        speedSlider.addEventListener('input', updatePhysics);
+        timeSlider.addEventListener('input', updatePhysics);
+      }
+
+      // ---------------- Slide 3: Pipeline Inspector ----------------
+      inspectPipeline(stageIndex) {
+        const tag = document.getElementById('pipeline-stage-tag');
+        const title = document.getElementById('pipeline-stage-title');
+        const desc = document.getElementById('pipeline-stage-desc');
+
+        const stages = [
+          {
+            tag: "STAGE 01 // VIDEO INGESTION",
+            title: "Local WebRTC Video Acquisition (Zero Cloud Ingestion)",
+            desc: "สตรีมวิดีโอจากกล้องเว็บแคมส่งตรงเข้าสู่หน่วยความจำ RAM ของเครื่องผ่าน Web API ในรูปแบบ RGBA Canvas โดยไม่มีการบีบอัดส่งข้ามโครงข่ายอินเทอร์เน็ตแม้แต่ไบต์เดียว รักษาความเป็นส่วนตัว 100%"
+          },
+          {
+            tag: "STAGE 02 // MESH INFERENCE",
+            title: "MediaPipe 478 Landmark 3D Mesh Generation",
+            desc: "ประมวลผลด้วย WebGL Shader ผ่านเบราว์เซอร์ เพื่อระบุโครงข่ายพิกัดใบหน้า 478 จุดแบบ 3 มิติ (X, Y, Z) ด้วยความเร็วเฉลี่ย 16-24ms ต่อเฟรมบน GPU ของอุปกรณ์"
+          },
+          {
+            tag: "STAGE 03 // GEOMETRIC EXTRACTION",
+            title: "Euclidean Vector Metric Calculation (EAR & MAR)",
+            desc: "คำนวณระยะห่างทางคณิตศาสตร์ระหว่างจุดพิกัดดวงตา P1–P6 และจุดพิกัดริมฝีปาก แปลงเป็นสัดส่วนไร้หน่วย (Unitless Ratio) ที่คงที่แม้ผู้ขับขี่จะขยับหัวเข้าใกล้หรือออกห่างจากกล้อง"
+          },
+          {
+            tag: "STAGE 04 // TEMPORAL ANALYSIS",
+            title: "Rolling 45-Frame Time-Series & Debouncing",
+            desc: "เก็บค่าสถิติย้อนหลัง 1.5 วินาที (ประมาณ 45 เฟรมที่ 30 FPS) เพื่อแยกแยะการกะพริบตาตามธรรมชาติ (150-300ms) ออกจากอาการหลับในแท้จริง (Microsleep ≥ 1,500ms) ลด False Positive ให้เป็นศูนย์"
+          },
+          {
+            tag: "STAGE 05 // DUAL DISPATCH ALARM",
+            title: "Web Audio Synthesizer & Speech Synthesis Trigger",
+            desc: "ขับสัญญาณเสียงไซเรนฉุกเฉินความถี่ 880Hz / 1320Hz ผ่าน Web Audio API Oscillator ร่วมกับเสียงเตือนสติภาษาไทย และไฟกระพริบ Emergency Strobe ปลุกผู้ขับขี่อย่างปลอดภัย"
+          }
+        ];
+
+        if (stages[stageIndex]) {
+          tag.textContent = stages[stageIndex].tag;
+          title.textContent = stages[stageIndex].title;
+          desc.textContent = stages[stageIndex].desc;
+        }
+      }
+
+      // ---------------- Slide 4: Live Simulator & Waveform ----------------
       initSimulator() {
         const slider = document.getElementById('sim-slider');
         const valText = document.getElementById('sim-ear-val');
@@ -703,63 +1329,203 @@
         const ptBot1 = document.getElementById('pt-bot1');
         const ptBot2 = document.getElementById('pt-bot2');
 
-        if (!slider) return;
-
-        slider.addEventListener('input', (e) => {
-          const ear = parseFloat(e.target.value);
+        const updateEyeVector = (ear) => {
+          this.targetEar = ear;
           valText.textContent = ear.toFixed(2);
 
-          // Calculate height of eye based on EAR (0.08 is closed, 0.38 is fully open)
-          // Normal open: y from 15 to 75. Closed: y approaches 45.
-          const openness = (ear - 0.08) / (0.38 - 0.08); // 0.0 to 1.0
-          const topY = 45 - openness * 30; // 45 to 15
-          const botY = 45 + openness * 30; // 45 to 75
+          const openness = (ear - 0.08) / (0.38 - 0.08);
+          const topY = 42 - openness * 28;
+          const botY = 42 + openness * 28;
 
-          // Animate Eye Outline
-          eyeOutline.setAttribute('d', `M 20 45 Q 80 ${topY} 140 45 Q 80 ${botY} 20 45 Z`);
+          eyeOutline.setAttribute('d', `M 25 42 Q 90 ${topY} 155 42 Q 90 ${botY} 25 42 Z`);
+          iris.setAttribute('r', Math.max(2, openness * 15));
+          pupil.setAttribute('r', Math.max(1, openness * 6));
 
-          // Scale Iris & Pupil vertically
-          const irisRadius = Math.max(2, openness * 16);
-          iris.setAttribute('r', irisRadius);
-          pupil.setAttribute('r', Math.max(1, openness * 7));
+          ptTop1.setAttribute('cy', 42 - openness * 19);
+          ptTop2.setAttribute('cy', 42 - openness * 19);
+          ptBot1.setAttribute('cy', 42 + openness * 19);
+          ptBot2.setAttribute('cy', 42 + openness * 19);
 
-          // Move Keypoint dots
-          ptTop1.setAttribute('cy', 45 - openness * 20);
-          ptTop2.setAttribute('cy', 45 - openness * 20);
-          ptBot1.setAttribute('cy', 45 + openness * 20);
-          ptBot2.setAttribute('cy', 45 + openness * 20);
-
-          // Update Status Badge and Colors
           if (ear < 0.22) {
-            // Alarm state
-            badge.textContent = '🚨 หลับใน (MICROSLEEP ALARM)';
-            badge.style.background = 'rgba(239, 68, 68, 0.25)';
-            badge.style.color = '#f87171';
-            badge.style.borderColor = 'rgba(239, 68, 68, 0.5)';
-            valText.style.color = '#f87171';
-            eyeOutline.setAttribute('stroke', '#ef4444');
+            badge.textContent = 'MICROSLEEP ALARM';
+            badge.style.background = 'rgba(255, 59, 92, 0.2)';
+            badge.style.color = 'var(--accent-crimson)';
+            badge.style.borderColor = 'rgba(255, 59, 92, 0.4)';
+            valText.style.color = 'var(--accent-crimson)';
+            eyeOutline.setAttribute('stroke', 'var(--accent-crimson)');
           } else if (ear < 0.26) {
-            // Warning state
-            badge.textContent = '⚠️ เริ่มง่วง (WARNING)';
-            badge.style.background = 'rgba(245, 158, 11, 0.25)';
-            badge.style.color = '#fbbf24';
-            badge.style.borderColor = 'rgba(245, 158, 11, 0.5)';
-            valText.style.color = '#fbbf24';
-            eyeOutline.setAttribute('stroke', '#f59e0b');
+            badge.textContent = 'DROWSY WARNING';
+            badge.style.background = 'rgba(245, 158, 11, 0.2)';
+            badge.style.color = 'var(--accent-amber)';
+            badge.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+            valText.style.color = 'var(--accent-amber)';
+            eyeOutline.setAttribute('stroke', 'var(--accent-amber)');
           } else {
-            // Normal state
-            badge.textContent = 'ตื่นตัวปกติ (NORMAL)';
-            badge.style.background = 'rgba(16, 185, 129, 0.2)';
-            badge.style.color = '#34d399';
-            badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-            valText.style.color = '#22d3ee';
-            eyeOutline.setAttribute('stroke', '#22d3ee');
+            badge.textContent = 'NORMAL AWAKE';
+            badge.style.background = 'rgba(0, 230, 118, 0.15)';
+            badge.style.color = 'var(--accent-emerald)';
+            badge.style.borderColor = 'rgba(0, 230, 118, 0.3)';
+            valText.style.color = 'var(--accent-cyan)';
+            eyeOutline.setAttribute('stroke', 'var(--accent-cyan)');
           }
+        };
+
+        slider.addEventListener('input', (e) => {
+          updateEyeVector(parseFloat(e.target.value));
         });
+
+        // Scenario Presets
+        document.getElementById('sim-preset-blink').addEventListener('click', () => {
+          slider.value = 0.12;
+          updateEyeVector(0.12);
+          setTimeout(() => {
+            slider.value = 0.30;
+            updateEyeVector(0.30);
+          }, 250);
+        });
+
+        document.getElementById('sim-preset-drowsy').addEventListener('click', () => {
+          slider.value = 0.24;
+          updateEyeVector(0.24);
+          setTimeout(() => {
+            slider.value = 0.30;
+            updateEyeVector(0.30);
+          }, 1200);
+        });
+
+        document.getElementById('sim-preset-alarm').addEventListener('click', () => {
+          slider.value = 0.10;
+          updateEyeVector(0.10);
+          setTimeout(() => {
+            slider.value = 0.30;
+            updateEyeVector(0.30);
+          }, 2500);
+        });
+      }
+
+      // Real-time Oscilloscope Waveform Loop
+      initWaveformLoop() {
+        const canvas = document.getElementById('sim-oscilloscope');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        const render = () => {
+          // Smooth interpolation towards target EAR
+          this.currentEar += (this.targetEar - this.currentEar) * 0.2;
+          // Add subtle natural jitter (+- 0.005)
+          const jitter = (Math.random() - 0.5) * 0.006;
+          const sample = Math.max(0.05, Math.min(0.40, this.currentEar + jitter));
+
+          this.waveformHistory.push(sample);
+          this.waveformHistory.shift();
+
+          // Draw Canvas
+          const w = canvas.width;
+          const h = canvas.height;
+          ctx.clearRect(0, 0, w, h);
+
+          // Grid Lines
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, h * 0.5);
+          ctx.lineTo(w, h * 0.5);
+          ctx.stroke();
+
+          // Threshold Line (EAR = 0.22)
+          // Scale: 0.08 at bottom (h), 0.38 at top (0)
+          const thresholdY = h - ((0.22 - 0.08) / (0.38 - 0.08)) * h;
+          ctx.strokeStyle = 'rgba(255, 59, 92, 0.4)';
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(0, thresholdY);
+          ctx.lineTo(w, thresholdY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Draw Waveform
+          ctx.strokeStyle = sample < 0.22 ? '#ff3b5c' : (sample < 0.26 ? '#f59e0b' : '#00e5ff');
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+
+          const step = w / (this.waveformHistory.length - 1);
+          this.waveformHistory.forEach((val, idx) => {
+            const y = h - ((val - 0.08) / (0.38 - 0.08)) * h;
+            if (idx === 0) ctx.moveTo(0, y);
+            else ctx.lineTo(idx * step, y);
+          });
+          ctx.stroke();
+
+          requestAnimationFrame(render);
+        };
+
+        requestAnimationFrame(render);
+      }
+
+      // ---------------- Slide 5: Live Audio Sandbox ----------------
+      initAudioSandbox() {
+        const sirenBtn = document.getElementById('test-siren-btn');
+        const speechBtn = document.getElementById('test-speech-btn');
+
+        sirenBtn.addEventListener('click', () => {
+          this.playSirenTonePreview();
+        });
+
+        speechBtn.addEventListener('click', () => {
+          this.playSpeechPreview();
+        });
+      }
+
+      initAudioCtx() {
+        if (!this.audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) this.audioCtx = new AudioContextClass();
+        }
+        if (this.audioCtx && this.audioCtx.state === 'suspended') {
+          this.audioCtx.resume();
+        }
+      }
+
+      playSirenTonePreview() {
+        this.initAudioCtx();
+        if (!this.audioCtx) return;
+
+        try {
+          const osc = this.audioCtx.createOscillator();
+          const gain = this.audioCtx.createGain();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(880, this.audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.3, this.audioCtx.currentTime);
+
+          osc.connect(gain);
+          gain.connect(this.audioCtx.destination);
+          osc.start();
+
+          // 3 Pulses: 880Hz -> 1320Hz -> 880Hz
+          osc.frequency.setValueAtTime(1320, this.audioCtx.currentTime + 0.2);
+          osc.frequency.setValueAtTime(880, this.audioCtx.currentTime + 0.4);
+          osc.frequency.setValueAtTime(1320, this.audioCtx.currentTime + 0.6);
+
+          gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.9);
+          osc.stop(this.audioCtx.currentTime + 0.95);
+        } catch (e) {
+          console.warn('Audio preview failed:', e);
+        }
+      }
+
+      playSpeechPreview() {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance("ตรวจพบอาการง่วงนอน กรุณาจอดพักผ่อนค่ะ");
+        utterance.lang = "th-TH";
+        utterance.rate = 1.05;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
       }
     }
 
-    // Launch Deck
+    // Launch Deck on Load
     window.addEventListener('DOMContentLoaded', () => {
       window.deck = new PresentationDeck();
     });
