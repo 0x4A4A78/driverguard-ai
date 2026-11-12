@@ -1,0 +1,38 @@
+{
+  "name": "driverguard-ai",
+  "version": "1.0.0",
+  "description": "Smart Driver Drowsiness Detection System with Computer Vision (MediaPipe Face Mesh)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "dev:https": "vite --host --https",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "preview:https": "vite preview --host --https"
+  },
+  "keywords": [
+    "ai",
+    "drowsiness-detection",
+    "computer-vision",
+    "mediapipe",
+    "facemesh",
+    "ear",
+    "web-audio"
+  ],
+  "author": "Mini-Project AI",
+  "license": "MIT",
+  "dependencies": {
+    "@mediapipe/camera_utils": "^0.4.1675466862",
+    "@mediapipe/drawing_utils": "^0.3.1675466124",
+    "@mediapipe/face_mesh": "^0.4.1633559619",
+    "canvas-confetti": "^1.9.4",
+    "lucide": "^1.16.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@vitejs/plugin-basic-ssl": "^1.2.0",
+    "tailwindcss": "^4.0.0",
+    "vite": "^6.2.0"
+  }
+}
