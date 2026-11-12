@@ -70,7 +70,13 @@ export class PresentationModal {
 
     const noticeEl = document.getElementById('qr-localhost-notice');
     if (currentLoc.hostname === 'localhost' || currentLoc.hostname === '127.0.0.1') {
-      if (noticeEl) noticeEl.classList.remove('hidden');
+      // Automatically prefill the live Vercel URL for instant classroom scanning!
+      urlToUse = 'https://driverguard-ai.vercel.app';
+      if (noticeEl) {
+        noticeEl.classList.remove('hidden');
+        noticeEl.innerHTML = '<strong>✨ ลิงก์สาธารณะ (Vercel):</strong> ระบบใส่ลิงก์ Vercel ให้เรียบร้อย ทุกคนในห้องสามารถยกมือถือขึ้นมาสแกน QR Code นี้เพื่อเปิดทดสอบได้ทันทีครับ!';
+        noticeEl.className = 'mb-3 p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-600/40 text-emerald-200 text-[11px] text-left';
+      }
     } else {
       if (noticeEl) noticeEl.classList.add('hidden');
     }
