@@ -23,8 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "canvas-confetti": "^1.9.4",
-    "lucide": "^1.16.0",
-    "qrcode": "^1.5.4"
+    "lucide": "^1.16.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",

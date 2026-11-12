@@ -7,11 +7,9 @@ import './style.css';
 import { calculateEyeMetrics, calculateMAR, checkHeadSlump, getFaceBounds, EYE_INDICES, MOUTH_INDICES } from './geometry.js';
 import { alertAudio } from './audio.js';
 import { EarTelemetryChart } from './chart.js';
-import { PresentationModal } from './qrcode-modal.js';
 import { 
   createIcons, 
   ShieldAlert, 
-  QrCode, 
   BellRing, 
   Sliders, 
   AlertTriangle, 
@@ -121,7 +119,6 @@ class DrowsinessDetectorApp {
     this.ctx = this.dom.canvas.getContext('2d');
     this.chart = new EarTelemetryChart(this.dom.chartCanvas, 75);
     this.chart.setThreshold(this.config.earThreshold);
-    this.presentationModal = new PresentationModal();
     this.faceMesh = null;
     this.cameraStream = null;
     this.animFrameId = null;
@@ -133,7 +130,6 @@ class DrowsinessDetectorApp {
     createIcons({
       icons: {
         ShieldAlert,
-        QrCode,
         BellRing,
         Sliders,
         AlertTriangle,
