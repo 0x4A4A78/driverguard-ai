@@ -142,6 +142,20 @@
       z-index: 50;
     }
 
+    @media (max-width: 768px) {
+      .top-telemetry-bar {
+        padding: 0 1rem;
+        height: 3rem;
+      }
+      .slide {
+        padding: 3.5rem 1rem 4.5rem;
+        overflow-y: auto;
+      }
+      #header-slide-title, .telemetry-meta-subtitle {
+        display: none !important;
+      }
+    }
+
     /* Top Progress Bar */
     .deck-progress {
       position: absolute;
@@ -312,8 +326,8 @@
           DRIVERGUARD <span style="color: var(--accent-cyan);">AI</span>
         </span>
       </div>
-      <div style="width: 1px; height: 1.25rem; background: rgba(255,255,255,0.12);"></div>
-      <span class="font-mono" style="font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase;">
+      <div class="telemetry-meta-subtitle" style="width: 1px; height: 1.25rem; background: rgba(255,255,255,0.12);"></div>
+      <span class="font-mono telemetry-meta-subtitle" style="font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase;">
         SAU // AI-MINI-PROJECT // 2026
       </span>
     </div>
